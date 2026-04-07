@@ -10,6 +10,8 @@ import { RiskBadge } from '@/components/RiskBadge';
 import { MetricCard } from '@/components/MetricCard';
 import { RiskFactorTag } from '@/components/RiskFactorTag';
 import { Toast, useToast } from '@/components/Toast';
+import { ActivityTimeline } from '@/components/ActivityTimeline';
+import { exportRecoveryPlanPDF } from '@/lib/pdf-export';
 import type {
   StudentDetailData, RecoveryPlan, InterventionMessage,
   MiniAssessment, AssessmentSubmitData,
@@ -286,9 +288,15 @@ export default function StudentDetailPage() {
       {/* ─── Recovery Plan Display ─── */}
       {recoveryState === 'done' && recoveryPlan && (
         <section className="space-y-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <h2 className="text-lg font-bold tracking-tight">회복학습 플랜</h2>
             {recoveryTime && <span className="text-xs text-[var(--text-muted)]">{recoveryTime.toFixed(1)}초 만에 생성</span>}
+            <button
+              onClick={() => exportRecoveryPlanPDF(student, p, recoveryPlan)}
+              className="ml-auto px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-button)] bg-[var(--bg-warm)] text-[var(--text-secondary)] hover:bg-[var(--bg-warm-hover)] transition btn-press focus-ring"
+            >
+              PDF 내보내기
+            </button>
           </div>
           <div className="card p-6">
             <h3 className="text-sm font-semibold text-[var(--accent)] mb-2">놓친 개념 요약</h3>
@@ -435,6 +443,13 @@ export default function StudentDetailPage() {
           })}
         </section>
       )}
+
+      {/* ─── Activity Timeline ─── */}
+      <ActivityTimeline
+        recoveryPlans={data.recovery_plans.concat(recoveryPlan ? [recoveryPlan] : [])}
+        interventionMessages={data.intervention_messages.concat(interventionMsg ? [interventionMsg] : [])}
+        miniAssessments={data.mini_assessments.concat(assessment ? [assessment] : [])}
+      />
 
     </main>
   );

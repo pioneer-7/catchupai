@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { KpiCard } from '@/components/KpiCard';
 import { RiskBadge } from '@/components/RiskBadge';
 import { FadeIn } from '@/components/FadeIn';
+import { RiskChart } from '@/components/RiskChart';
 import type { StudentListData } from '@/types';
 
 export default function DashboardPage() {
@@ -65,6 +66,11 @@ export default function DashboardPage() {
         <FadeIn delay={120}><KpiCard title="주의" value={data.summary.warning} color="amber" /></FadeIn>
         <FadeIn delay={180}><KpiCard title="위험" value={data.summary.at_risk} color="red" /></FadeIn>
       </div>
+
+      {/* Risk Distribution Chart */}
+      <FadeIn delay={240} className="mb-12">
+        <RiskChart data={data.summary} total={data.total} />
+      </FadeIn>
 
       {/* Top-N At Risk */}
       <div className="mb-10">
