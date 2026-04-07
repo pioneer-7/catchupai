@@ -173,10 +173,10 @@ export default function StudentDetailPage() {
     return (
       <main className="flex-1 px-4 py-8 max-w-4xl mx-auto w-full">
         <div className="space-y-4">
-          <div className="h-28 rounded-xl bg-[#f6f5f4] animate-pulse" />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="h-28 rounded-xl bg-[var(--bg-warm)] animate-pulse" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-24 rounded-xl bg-[#f6f5f4] animate-pulse" />
+              <div key={i} className="h-24 rounded-xl bg-[var(--bg-warm)] animate-pulse" />
             ))}
           </div>
         </div>
@@ -187,9 +187,9 @@ export default function StudentDetailPage() {
   if (notFound || !data) {
     return (
       <main className="flex-1 px-4 py-8 max-w-4xl mx-auto w-full">
-        <div className="rounded-xl border border-black/10 bg-[#f6f5f4] p-12 text-center">
-          <p className="text-[#615d59] text-lg">학생을 찾을 수 없습니다</p>
-          <Link href="/students" className="mt-4 inline-block text-[#0075de] font-semibold hover:underline">
+        <div className="rounded-xl border border-black/10 bg-[var(--bg-warm)] p-12 text-center">
+          <p className="text-[var(--text-secondary)] text-lg">학생을 찾을 수 없습니다</p>
+          <Link href="/students" className="mt-4 inline-block text-[var(--accent)] font-semibold hover:underline">
             학생 목록으로 돌아가기
           </Link>
         </div>
@@ -202,10 +202,10 @@ export default function StudentDetailPage() {
   const anyLoading = recoveryState === 'loading' || messageState === 'loading' || assessmentState === 'loading';
 
   return (
-    <main className="flex-1 px-4 py-8 max-w-4xl mx-auto w-full space-y-6">
+    <main className="flex-1 px-6 py-12 max-w-4xl mx-auto w-full space-y-8">
       <Toast message={toastMsg} />
 
-      <Link href="/students" className="text-sm text-[#0075de] font-semibold hover:underline">
+      <Link href="/students" className="text-sm text-[var(--accent)] font-semibold hover:underline">
         &larr; 학생 목록
       </Link>
 
@@ -214,18 +214,18 @@ export default function StudentDetailPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{student.name}</h1>
-            {student.cohort_name && <p className="mt-1 text-sm text-[#615d59]">{student.cohort_name}</p>}
+            {student.cohort_name && <p className="mt-1 text-sm text-[var(--text-secondary)]">{student.cohort_name}</p>}
           </div>
           <div className="text-right">
             <RiskBadge level={p.risk_level} />
             <p className="mt-2 text-3xl font-bold tracking-tight">{p.risk_score}</p>
-            <p className="text-xs text-[#a39e98]">위험 점수</p>
+            <p className="text-xs text-[var(--text-muted)]">위험 점수</p>
           </div>
         </div>
       </section>
 
       {/* ─── Metric Cards ─── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <MetricCard title="출석률" value={p.attendance_rate} unit={`% (${p.missed_sessions}회 결석)`} alert={p.attendance_rate < 70} />
         <MetricCard title="과제 제출률" value={p.assignment_submission_rate} unit="%" alert={p.assignment_submission_rate < 60} />
         <MetricCard title="퀴즈 평균" value={p.avg_quiz_score} unit="점" alert={p.avg_quiz_score < 60} />
@@ -235,7 +235,7 @@ export default function StudentDetailPage() {
       {/* ─── Risk Factors ─── */}
       {p.risk_factors_json.length > 0 && (
         <section>
-          <h2 className="text-sm font-semibold text-[#615d59] mb-3">위험 요인</h2>
+          <h2 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">위험 요인</h2>
           <div className="flex flex-wrap gap-2">
             {p.risk_factors_json.map((f, i) => <RiskFactorTag key={i} factor={f} />)}
           </div>
@@ -244,8 +244,8 @@ export default function StudentDetailPage() {
 
       {/* ─── Action Buttons ─── */}
       <section className="border-t border-black/10 pt-6">
-        <h2 className="text-sm font-semibold text-[#615d59] mb-3">AI 지원 액션</h2>
-        <p className="text-xs text-[#a39e98] mb-4">AI 생성에는 약 5~10초가 소요됩니다</p>
+        <h2 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">AI 지원 액션</h2>
+        <p className="text-xs text-[var(--text-muted)] mb-4">AI 생성에는 약 5~10초가 소요됩니다</p>
         <div className="flex flex-wrap gap-3">
           <ActionButton label="회복학습 생성" state={recoveryState} onClick={handleGenerateRecovery} primary loadingText="플랜 생성 중..." />
           <ActionButton label="개입 메시지 생성" state={messageState} onClick={handleGenerateMessage} loadingText="메시지 작성 중..." />
@@ -253,7 +253,7 @@ export default function StudentDetailPage() {
           <button
             onClick={handleGenerateAll}
             disabled={anyLoading}
-            className="px-5 py-2.5 rounded font-semibold transition border border-[#0075de] text-[#0075de] hover:bg-[#0075de]/5 disabled:opacity-60"
+            className="px-5 py-2.5 rounded font-semibold transition border border-[#0075de] text-[var(--accent)] hover:bg-[#0075de]/5 disabled:opacity-60"
           >
             {anyLoading ? '생성 중...' : '전체 생성'}
           </button>
@@ -263,10 +263,10 @@ export default function StudentDetailPage() {
       {/* ─── Loading Skeleton (AI 생성 중) ─── */}
       {(recoveryState === 'loading' || messageState === 'loading' || assessmentState === 'loading') && (
         <section className="space-y-4">
-          <div className="h-20 rounded-xl bg-[#f6f5f4] animate-pulse" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="h-20 rounded-xl bg-[var(--bg-warm)] animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-28 rounded-xl bg-[#f6f5f4] animate-pulse" />
+              <div key={i} className="h-28 rounded-xl bg-[var(--bg-warm)] animate-pulse" />
             ))}
           </div>
         </section>
@@ -277,32 +277,32 @@ export default function StudentDetailPage() {
         <section className="space-y-4">
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-bold tracking-tight">회복학습 플랜</h2>
-            {recoveryTime && <span className="text-xs text-[#a39e98]">{recoveryTime.toFixed(1)}초 만에 생성</span>}
+            {recoveryTime && <span className="text-xs text-[var(--text-muted)]">{recoveryTime.toFixed(1)}초 만에 생성</span>}
           </div>
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-[#0075de] mb-2">놓친 개념 요약</h3>
+          <div className="card p-6">
+            <h3 className="text-sm font-semibold text-[var(--accent)] mb-2">놓친 개념 요약</h3>
             <p className="text-sm leading-relaxed">{recoveryPlan.missed_concepts_summary}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {recoveryPlan.recovery_steps_json.map(step => (
-              <div key={step.step} className="card p-5">
+              <div key={step.step} className="card p-6">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0075de] text-white text-xs font-bold">
                     {step.step}
                   </span>
                   <h4 className="font-bold text-sm">{step.title}</h4>
                 </div>
-                <p className="text-sm text-[#615d59] leading-relaxed">{step.description}</p>
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="card p-5">
-              <h3 className="text-sm font-semibold text-[#615d59] mb-2">액션 플랜</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="card p-6">
+              <h3 className="text-sm font-semibold text-[var(--text-secondary)] mb-2">액션 플랜</h3>
               <p className="text-sm leading-relaxed">{recoveryPlan.action_plan_text}</p>
             </div>
-            <div className="card p-5 border-l-4 border-l-[#dd5b00]">
-              <h3 className="text-sm font-semibold text-[#dd5b00] mb-2">주의 포인트</h3>
+            <div className="card p-6 border-l-4 border-l-[#dd5b00]">
+              <h3 className="text-sm font-semibold text-[var(--status-warning)] mb-2">주의 포인트</h3>
               <p className="text-sm leading-relaxed">{recoveryPlan.caution_points_text}</p>
             </div>
           </div>
@@ -314,9 +314,9 @@ export default function StudentDetailPage() {
         <section className="space-y-3">
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-bold tracking-tight">개입 메시지</h2>
-            {messageTime && <span className="text-xs text-[#a39e98]">{messageTime.toFixed(1)}초 만에 생성</span>}
+            {messageTime && <span className="text-xs text-[var(--text-muted)]">{messageTime.toFixed(1)}초 만에 생성</span>}
           </div>
-          <div className="rounded-xl bg-[#f6f5f4] p-5">
+          <div className="rounded-xl bg-[var(--bg-warm)] p-5">
             <p className="text-sm leading-relaxed whitespace-pre-wrap">{interventionMsg.content}</p>
           </div>
           <button
@@ -333,12 +333,12 @@ export default function StudentDetailPage() {
         <section className="space-y-4">
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-bold tracking-tight">미니 진단</h2>
-            {assessmentTime && <span className="text-xs text-[#a39e98]">{assessmentTime.toFixed(1)}초 만에 생성</span>}
+            {assessmentTime && <span className="text-xs text-[var(--text-muted)]">{assessmentTime.toFixed(1)}초 만에 생성</span>}
           </div>
           {assessment.questions_json.map(q => (
-            <div key={q.id} className="card p-5">
+            <div key={q.id} className="card p-6">
               <p className="font-semibold text-sm mb-3">
-                <span className="text-[#0075de] mr-2">Q{q.id}.</span>
+                <span className="text-[var(--accent)] mr-2">Q{q.id}.</span>
                 {q.question}
               </p>
               {q.type === 'multiple_choice' && q.options ? (
@@ -362,7 +362,7 @@ export default function StudentDetailPage() {
                   value={answers[q.id] || ''}
                   onChange={e => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                   placeholder="답변을 입력하세요"
-                  className="w-full px-3 py-2 rounded border border-[#ddd] text-sm focus:outline-none focus:ring-2 focus:ring-[#0075de]/30 placeholder:text-[#a39e98]"
+                  className="w-full px-3 py-2 rounded border border-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[#0075de]/30 placeholder:text-[var(--text-muted)]"
                 />
               )}
             </div>
@@ -383,20 +383,20 @@ export default function StudentDetailPage() {
           <h2 className="text-lg font-bold tracking-tight">진단 결과</h2>
           <div className="card p-6 text-center">
             <p className="text-4xl font-bold tracking-tight">
-              {submitResult.score} <span className="text-lg text-[#a39e98]">/ {submitResult.total}</span>
+              {submitResult.score} <span className="text-lg text-[var(--text-muted)]">/ {submitResult.total}</span>
             </p>
-            <p className="mt-1 text-sm text-[#615d59]">정답 수</p>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">정답 수</p>
           </div>
-          <div className="card p-5 flex items-center justify-center gap-4">
+          <div className="card p-6 flex items-center justify-center gap-6">
             <div className="text-center">
-              <p className="text-sm text-[#a39e98]">변경 전</p>
+              <p className="text-sm text-[var(--text-muted)]">변경 전</p>
               <p className="text-2xl font-bold">{submitResult.risk_score_before}</p>
               <RiskBadge level={submitResult.risk_level_before} size="sm" />
             </div>
-            <span className="text-2xl text-[#a39e98]">&rarr;</span>
+            <span className="text-2xl text-[var(--text-muted)]">&rarr;</span>
             <div className="text-center">
-              <p className="text-sm text-[#a39e98]">변경 후</p>
-              <p className="text-2xl font-bold text-[#1aae39]">{submitResult.risk_score_after}</p>
+              <p className="text-sm text-[var(--text-muted)]">변경 후</p>
+              <p className="text-2xl font-bold text-[var(--status-stable)]">{submitResult.risk_score_after}</p>
               <RiskBadge level={submitResult.risk_level_after} size="sm" />
             </div>
           </div>
@@ -406,18 +406,18 @@ export default function StudentDetailPage() {
             const userAnswer = assessment.submitted_answers_json?.find(a => a.id === q.id);
             const isCorrect = userAnswer && correct && userAnswer.answer.trim() === correct.answer.trim();
             return (
-              <div key={q.id} className="card p-5">
+              <div key={q.id} className="card p-6">
                 <p className="font-semibold text-sm mb-2">
-                  <span className="text-[#0075de] mr-2">Q{q.id}.</span>{q.question}
+                  <span className="text-[var(--accent)] mr-2">Q{q.id}.</span>{q.question}
                 </p>
                 <div className="space-y-1 text-sm">
                   <p>
-                    <span className={isCorrect ? 'text-[#1aae39]' : 'text-[#d32f2f]'}>
+                    <span className={isCorrect ? 'text-[var(--status-stable)]' : 'text-[var(--status-risk)]'}>
                       {isCorrect ? '✓' : '✗'} 내 답: {userAnswer?.answer || answers[q.id] || '(미답)'}
                     </span>
                   </p>
-                  {!isCorrect && <p className="text-[#1aae39]">정답: {correct?.answer}</p>}
-                  {explanation && <p className="text-[#615d59] mt-1">{explanation.explanation}</p>}
+                  {!isCorrect && <p className="text-[var(--status-stable)]">정답: {correct?.answer}</p>}
+                  {explanation && <p className="text-[var(--text-secondary)] mt-1">{explanation.explanation}</p>}
                 </div>
               </div>
             );
@@ -425,14 +425,6 @@ export default function StudentDetailPage() {
         </section>
       )}
 
-      <style jsx>{`
-        .card {
-          border-radius: 12px;
-          border: 1px solid rgba(0, 0, 0, 0.1);
-          background: #ffffff;
-          box-shadow: rgba(0,0,0,0.04) 0px 4px 18px, rgba(0,0,0,0.027) 0px 2.025px 7.85px, rgba(0,0,0,0.02) 0px 0.8px 2.93px, rgba(0,0,0,0.01) 0px 0.175px 1.04px;
-        }
-      `}</style>
     </main>
   );
 }
@@ -455,7 +447,7 @@ function ActionButton({
         {isLoading ? loadingText : state === 'done' ? `${label} (재생성)` : label}
       </button>
       {state === 'error' && (
-        <p className="mt-1 text-xs text-[#d32f2f]">생성 실패 — 다시 시도해주세요</p>
+        <p className="mt-1 text-xs text-[var(--status-risk)]">생성 실패 — 다시 시도해주세요</p>
       )}
     </div>
   );

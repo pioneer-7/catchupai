@@ -77,7 +77,7 @@ export default function UploadPage() {
   const anySuccess = csvStatus === 'success' || materialStatus === 'success';
 
   return (
-    <main className="flex-1 px-4 py-8 max-w-4xl mx-auto w-full">
+    <main className="flex-1 px-6 py-12 max-w-4xl mx-auto w-full">
       <h1 className="text-2xl font-bold tracking-tight mb-2">데이터 업로드</h1>
       <p className="text-[#615d59] mb-8">강의자료와 학생 데이터를 업로드하세요</p>
 
