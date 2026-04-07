@@ -79,20 +79,22 @@ export default function UploadPage() {
   return (
     <main className="flex-1 px-6 py-12 max-w-4xl mx-auto w-full">
       <h1 className="text-2xl font-bold tracking-tight mb-2">데이터 업로드</h1>
-      <p className="text-[#615d59] mb-8">강의자료와 학생 데이터를 업로드하세요</p>
+      <p className="text-[var(--text-secondary)] mb-8">강의자료와 학생 데이터를 업로드하세요</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* CSV Upload Card */}
-        <div
-          className="rounded-xl border border-black/10 bg-white p-6"
-          style={{
-            boxShadow: 'rgba(0,0,0,0.04) 0px 4px 18px, rgba(0,0,0,0.027) 0px 2.025px 7.85px, rgba(0,0,0,0.02) 0px 0.8px 2.93px, rgba(0,0,0,0.01) 0px 0.175px 1.04px',
-          }}
-        >
-          <h2 className="text-lg font-bold tracking-tight mb-2">학생 데이터 (CSV)</h2>
-          <p className="text-sm text-[#615d59] mb-4">
+        <div className="card p-8">
+          <h2 className="text-lg heading-md mb-2">학생 데이터 (CSV)</h2>
+          <p className="text-sm text-[var(--text-secondary)] mb-2">
             학생별 출결, 과제, 퀴즈 데이터가 포함된 CSV 파일
           </p>
+          <a
+            href="/sample/template.csv"
+            download
+            className="inline-block text-xs text-[var(--accent)] font-semibold hover:underline mb-4"
+          >
+            CSV 템플릿 다운로드 →
+          </a>
           <input
             type="file"
             accept=".csv"
@@ -102,30 +104,25 @@ export default function UploadPage() {
           <button
             onClick={handleCsvUpload}
             disabled={!csvFile || csvStatus === 'uploading'}
-            className="w-full px-4 py-2.5 bg-[#0075de] text-white rounded font-semibold hover:bg-[#005bab] transition disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2.5 bg-[var(--accent)] text-white rounded font-semibold hover:bg-[var(--accent-hover)] transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {csvStatus === 'uploading' ? '업로드 중...' : 'CSV 업로드'}
           </button>
           {csvStatus === 'success' && csvResult && (
-            <p className="mt-3 text-sm text-[#1aae39] font-medium">
+            <p className="mt-3 text-sm text-[var(--status-stable)] font-medium">
               {csvResult.processed}명 처리 완료
               {csvResult.skipped > 0 && ` (${csvResult.skipped}건 건너뜀)`}
             </p>
           )}
           {csvStatus === 'error' && (
-            <p className="mt-3 text-sm text-[#d32f2f] font-medium">{errorMsg}</p>
+            <p className="mt-3 text-sm text-[var(--status-risk)] font-medium">{errorMsg}</p>
           )}
         </div>
 
         {/* Material Upload Card */}
-        <div
-          className="rounded-xl border border-black/10 bg-white p-6"
-          style={{
-            boxShadow: 'rgba(0,0,0,0.04) 0px 4px 18px, rgba(0,0,0,0.027) 0px 2.025px 7.85px, rgba(0,0,0,0.02) 0px 0.8px 2.93px, rgba(0,0,0,0.01) 0px 0.175px 1.04px',
-          }}
-        >
-          <h2 className="text-lg font-bold tracking-tight mb-2">강의자료</h2>
-          <p className="text-sm text-[#615d59] mb-4">
+        <div className="card p-8">
+          <h2 className="text-lg heading-md mb-2">강의자료</h2>
+          <p className="text-sm text-[var(--text-secondary)] mb-4">
             PDF 또는 텍스트 파일로 강의자료를 업로드하세요
           </p>
           <input
@@ -137,17 +134,17 @@ export default function UploadPage() {
           <button
             onClick={handleMaterialUpload}
             disabled={!materialFile || materialStatus === 'uploading'}
-            className="w-full px-4 py-2.5 bg-[#0075de] text-white rounded font-semibold hover:bg-[#005bab] transition disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2.5 bg-[var(--accent)] text-white rounded font-semibold hover:bg-[var(--accent-hover)] transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {materialStatus === 'uploading' ? '업로드 중...' : '강의자료 업로드'}
           </button>
           {materialStatus === 'success' && materialResult && (
-            <p className="mt-3 text-sm text-[#1aae39] font-medium">
+            <p className="mt-3 text-sm text-[var(--status-stable)] font-medium">
               업로드 완료 ({materialResult.material_length.toLocaleString()}자)
             </p>
           )}
           {materialStatus === 'error' && (
-            <p className="mt-3 text-sm text-[#d32f2f] font-medium">{errorMsg}</p>
+            <p className="mt-3 text-sm text-[var(--status-risk)] font-medium">{errorMsg}</p>
           )}
         </div>
       </div>
@@ -157,7 +154,7 @@ export default function UploadPage() {
         {anySuccess && (
           <Link
             href="/dashboard"
-            className="px-6 py-3 bg-[#0075de] text-white rounded font-semibold hover:bg-[#005bab] transition"
+            className="px-6 py-3 bg-[var(--accent)] text-white rounded font-semibold hover:bg-[var(--accent-hover)] transition"
           >
             대시보드로 이동
           </Link>

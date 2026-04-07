@@ -1,0 +1,2 @@
+student_name,email,cohort_name,attendance_rate,missed_sessions,assignment_submission_rate,avg_quiz_score,last_active_days_ago,notes
+홍길동,hong@example.com,데이터분석 1기,85,1,80,75,3,예시 학생
