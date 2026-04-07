@@ -257,6 +257,18 @@ export function addMiniAssessment(assessment: MiniAssessment): void {
   store.miniAssessments.set(assessment.student_id, list);
 }
 
+export function getMiniAssessment(studentId: string, assessmentId: string): MiniAssessment | null {
+  const list = store.miniAssessments.get(studentId) || [];
+  return list.find(a => a.id === assessmentId) || null;
+}
+
+export function updateMiniAssessment(studentId: string, assessmentId: string, updates: Partial<MiniAssessment>): MiniAssessment | null {
+  const assessment = getMiniAssessment(studentId, assessmentId);
+  if (!assessment) return null;
+  Object.assign(assessment, updates);
+  return assessment;
+}
+
 export function updateProgress(studentId: string, courseId: string, updates: Partial<StudentProgress>): StudentProgress | null {
   const key = `${studentId}_${courseId}`;
   const p = store.progress.get(key);
