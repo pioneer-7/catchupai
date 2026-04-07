@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { KpiCard } from '@/components/KpiCard';
 import { RiskBadge } from '@/components/RiskBadge';
+import { FadeIn } from '@/components/FadeIn';
 import type { StudentListData } from '@/types';
 
 export default function DashboardPage() {
@@ -59,19 +60,19 @@ export default function DashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-        <KpiCard title="전체 학생" value={data.total} color="gray" />
-        <KpiCard title="안정" value={data.summary.stable} color="green" />
-        <KpiCard title="주의" value={data.summary.warning} color="amber" />
-        <KpiCard title="위험" value={data.summary.at_risk} color="red" />
+        <FadeIn delay={0}><KpiCard title="전체 학생" value={data.total} color="gray" /></FadeIn>
+        <FadeIn delay={60}><KpiCard title="안정" value={data.summary.stable} color="green" /></FadeIn>
+        <FadeIn delay={120}><KpiCard title="주의" value={data.summary.warning} color="amber" /></FadeIn>
+        <FadeIn delay={180}><KpiCard title="위험" value={data.summary.at_risk} color="red" /></FadeIn>
       </div>
 
       {/* Top-N At Risk */}
       <div className="mb-10">
         <h2 className="text-lg heading-md mb-6">위험도 높은 학생</h2>
         <div className="space-y-3">
-          {topStudents.map(student => (
+          {topStudents.map((student, i) => (
+            <FadeIn key={student.id} delay={240 + i * 60}>
             <Link
-              key={student.id}
               href={`/students/${student.id}`}
               className="card card-hover flex items-center justify-between p-5 block"
             >
@@ -86,6 +87,7 @@ export default function DashboardPage() {
                 <span className="text-[var(--text-muted)]">&rarr;</span>
               </div>
             </Link>
+            </FadeIn>
           ))}
         </div>
       </div>

@@ -25,9 +25,16 @@ export function SampleDataButton({ className }: { className?: string }) {
     <button
       onClick={handleClick}
       disabled={loading}
-      className={`px-6 py-3 bg-[#0075de] text-white rounded font-semibold hover:bg-[#005bab] transition disabled:opacity-60 ${className || ''}`}
+      className={`px-6 py-3 bg-[var(--accent)] text-white rounded-[var(--radius-button)] font-semibold hover:bg-[var(--accent-hover)] transition btn-press focus-ring disabled:opacity-60 ${className || ''}`}
     >
-      {loading ? '데이터 로딩 중...' : '샘플 데이터로 시작'}
+      {loading ? (
+        <span className="flex items-center gap-2">
+          <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          데이터 로딩 중...
+        </span>
+      ) : (
+        '샘플 데이터로 시작'
+      )}
     </button>
   );
 }

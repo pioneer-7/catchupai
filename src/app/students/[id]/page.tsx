@@ -253,7 +253,7 @@ export default function StudentDetailPage() {
           <button
             onClick={handleGenerateAll}
             disabled={anyLoading}
-            className="px-5 py-2.5 rounded font-semibold transition border border-[#0075de] text-[var(--accent)] hover:bg-[#0075de]/5 disabled:opacity-60"
+            className="px-5 py-2.5 rounded-[var(--radius-button)] font-semibold transition btn-press focus-ring border border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent-light)] disabled:opacity-60"
           >
             {anyLoading ? '생성 중...' : '전체 생성'}
           </button>
@@ -262,11 +262,22 @@ export default function StudentDetailPage() {
 
       {/* ─── Loading Skeleton (AI 생성 중) ─── */}
       {(recoveryState === 'loading' || messageState === 'loading' || assessmentState === 'loading') && (
-        <section className="space-y-4">
-          <div className="h-20 rounded-xl bg-[var(--bg-warm)] animate-pulse" />
+        <section className="space-y-6">
+          <div className="card p-6 space-y-3">
+            <div className="h-4 w-32 rounded bg-[var(--bg-warm)] animate-pulse" />
+            <div className="h-4 w-full rounded bg-[var(--bg-warm)] animate-pulse" />
+            <div className="h-4 w-3/4 rounded bg-[var(--bg-warm)] animate-pulse" />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-28 rounded-xl bg-[var(--bg-warm)] animate-pulse" />
+              <div key={i} className="card p-6 space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 rounded-full bg-[var(--bg-warm)] animate-pulse" />
+                  <div className="h-4 w-24 rounded bg-[var(--bg-warm)] animate-pulse" />
+                </div>
+                <div className="h-4 w-full rounded bg-[var(--bg-warm)] animate-pulse" />
+                <div className="h-4 w-2/3 rounded bg-[var(--bg-warm)] animate-pulse" />
+              </div>
             ))}
           </div>
         </section>
@@ -438,13 +449,18 @@ function ActionButton({
 }) {
   const isLoading = state === 'loading';
   const base = primary
-    ? 'bg-[#0075de] text-white hover:bg-[#005bab]'
-    : 'bg-black/5 text-black/95 hover:bg-black/10';
+    ? 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
+    : 'bg-[var(--bg-warm)] text-[var(--text-primary)] hover:bg-[var(--bg-warm-hover)]';
   return (
     <div>
       <button onClick={onClick} disabled={isLoading}
-        className={`px-5 py-2.5 rounded font-semibold transition disabled:opacity-60 ${base}`}>
-        {isLoading ? loadingText : state === 'done' ? `${label} (재생성)` : label}
+        className={`px-5 py-2.5 rounded-[var(--radius-button)] font-semibold transition btn-press focus-ring disabled:opacity-60 ${base}`}>
+        {isLoading ? (
+          <span className="flex items-center gap-2">
+            <span className="h-3.5 w-3.5 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+            {loadingText}
+          </span>
+        ) : state === 'done' ? `${label} (재생성)` : label}
       </button>
       {state === 'error' && (
         <p className="mt-1 text-xs text-[var(--status-risk)]">생성 실패 — 다시 시도해주세요</p>
