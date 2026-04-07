@@ -52,7 +52,7 @@ async function run() {
     log(!nav ? '✅' : '⚠️', `NavHeader 숨김 (랜딩): ${!nav ? 'OK' : 'VISIBLE'}`);
 
     // 기능 소개 카드 3개
-    const featureCards = await page.$$('section.bg-\\[\\#f6f5f4\\] .rounded-xl');
+    const featureCards = await page.$$('section .card');
     log(featureCards.length === 3 ? '✅' : '❌', `기능 소개 카드: ${featureCards.length}개 (기대: 3)`);
 
     // "샘플 데이터로 시작" 버튼
@@ -68,7 +68,7 @@ async function run() {
     // ═══════════════════════════════════════════
     log('📄', '=== 2. 샘플 데이터 로드 + 대시보드 (/dashboard) ===');
     await sampleBtn.click();
-    await page.waitForURL('**/dashboard', { timeout: 15000 });
+    await page.waitForURL('**/dashboard', { timeout: 30000 });
     log('✅', `대시보드로 이동 완료: ${page.url()}`);
 
     // 데이터 로딩 완료 대기 (KPI 텍스트가 나타날 때까지)
@@ -80,7 +80,7 @@ async function run() {
     log(dashNav ? '✅' : '❌', `NavHeader 표시 (대시보드)`);
 
     // KPI 카드 4개
-    const kpiCards = await page.$$('.grid .rounded-xl');
+    const kpiCards = await page.$$('.grid .card');
     log(kpiCards.length >= 4 ? '✅' : '❌', `KPI 카드: ${kpiCards.length}개 (기대: 4+)`);
 
     // KPI 텍스트 확인
@@ -164,7 +164,7 @@ async function run() {
     log(riskBadge ? '✅' : '❌', `위험 배지 표시`);
 
     // 4 지표 카드
-    const metricCards = await page.$$('.grid .rounded-xl');
+    const metricCards = await page.$$('.grid .card');
     log(metricCards.length >= 4 ? '✅' : '⚠️', `지표 카드: ${metricCards.length}개 (기대: 4)`);
 
     // 위험 요인 태그
@@ -182,8 +182,8 @@ async function run() {
     await recoveryBtn.click();
     await page.waitForTimeout(1000);
 
-    // 결과 대기 (fallback이라 빠름, AI면 ~10초)
-    await page.waitForSelector('text=회복학습 플랜', { timeout: 20000 }).catch(() => null);
+    // 결과 대기 (실제 AI 호출 시 ~15초)
+    await page.waitForSelector('text=회복학습 플랜', { timeout: 30000 }).catch(() => null);
     await page.waitForTimeout(500);
     const recoverySection = await page.textContent('main');
     const hasRecovery = recoverySection?.includes('회복학습 플랜') || recoverySection?.includes('놓친 개념');
@@ -198,7 +198,7 @@ async function run() {
     const messageBtn = await page.$('button:has-text("개입 메시지")');
     log(messageBtn ? '✅' : '❌', `"개입 메시지 생성" 버튼 존재`);
     await messageBtn.click();
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(15000);
 
     const messageSection = await page.textContent('main');
     const hasMessage = messageSection?.includes('개입 메시지') && messageSection?.includes('메시지 복사');
@@ -216,7 +216,7 @@ async function run() {
     const assessmentBtn = await page.$('button:has-text("미니 진단")');
     log(assessmentBtn ? '✅' : '❌', `"미니 진단 생성" 버튼 존재`);
     await assessmentBtn.click();
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(15000);
 
     // 3문항 확인
     const questions = await page.$$('text=/Q[0-9]/');
