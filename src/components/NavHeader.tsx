@@ -4,7 +4,8 @@
 // 랜딩 페이지(/)에서는 숨김
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const NAV_LINKS = [
   { href: '/dashboard', label: '대시보드' },
@@ -14,9 +15,18 @@ const NAV_LINKS = [
 
 export function NavHeader() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [resetting, setResetting] = useState(false);
 
-  // 랜딩 페이지에서는 숨김
   if (pathname === '/') return null;
+
+  async function handleReset() {
+    setResetting(true);
+    await fetch('/api/upload/sample', { method: 'POST' });
+    setResetting(false);
+    router.push('/dashboard');
+    router.refresh();
+  }
 
   return (
     <header className="border-b border-black/10 bg-white">
@@ -38,6 +48,14 @@ export function NavHeader() {
               {label}
             </Link>
           ))}
+          <button
+            onClick={handleReset}
+            disabled={resetting}
+            className="text-xs px-3 py-1.5 rounded bg-[#f6f5f4] text-[#615d59] font-medium hover:bg-black/10 transition disabled:opacity-50"
+            title="샘플 데이터로 초기화"
+          >
+            {resetting ? '리셋 중...' : '데모 리셋'}
+          </button>
         </div>
       </nav>
     </header>

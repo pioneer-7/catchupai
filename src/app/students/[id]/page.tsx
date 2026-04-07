@@ -1,6 +1,6 @@
 'use client';
 
-// 학생 상세 페이지 — AI 액션 + 결과 표시
+// 학생 상세 페이지 — AI 액션 + 결과 표시 + UX 폴리싱
 // SSOT: specs/003-frontend/student-detail-spec.md
 
 import { useEffect, useState } from 'react';
@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { RiskBadge } from '@/components/RiskBadge';
 import { MetricCard } from '@/components/MetricCard';
 import { RiskFactorTag } from '@/components/RiskFactorTag';
+import { Toast, useToast } from '@/components/Toast';
 import type {
   StudentDetailData, RecoveryPlan, InterventionMessage,
   MiniAssessment, AssessmentSubmitData,
@@ -21,12 +22,16 @@ export default function StudentDetailPage() {
   const [data, setData] = useState<StudentDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const { message: toastMsg, toast } = useToast();
 
-  // AI generation states
+  // AI generation states + timing
   const [recoveryState, setRecoveryState] = useState<GenState>('idle');
   const [messageState, setMessageState] = useState<GenState>('idle');
   const [assessmentState, setAssessmentState] = useState<GenState>('idle');
   const [submitState, setSubmitState] = useState<GenState>('idle');
+  const [recoveryTime, setRecoveryTime] = useState<number | null>(null);
+  const [messageTime, setMessageTime] = useState<number | null>(null);
+  const [assessmentTime, setAssessmentTime] = useState<number | null>(null);
 
   // AI results
   const [recoveryPlan, setRecoveryPlan] = useState<RecoveryPlan | null>(null);
@@ -36,7 +41,6 @@ export default function StudentDetailPage() {
 
   // Assessment answers
   const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetch(`/api/students/${id}`)
@@ -44,7 +48,6 @@ export default function StudentDetailPage() {
       .then(json => {
         if (json.success) {
           setData(json.data);
-          // Pre-populate existing AI results
           if (json.data.recovery_plans[0]) {
             setRecoveryPlan(json.data.recovery_plans[0]);
             setRecoveryState('done');
@@ -71,16 +74,22 @@ export default function StudentDetailPage() {
 
   async function handleGenerateRecovery() {
     setRecoveryState('loading');
+    const start = Date.now();
     try {
       const res = await fetch(`/api/students/${id}/recovery-plan`, { method: 'POST' });
       const json = await res.json();
-      if (json.success) { setRecoveryPlan(json.data); setRecoveryState('done'); }
-      else setRecoveryState('error');
+      if (json.success) {
+        setRecoveryPlan(json.data);
+        setRecoveryState('done');
+        setRecoveryTime((Date.now() - start) / 1000);
+        toast('회복학습 플랜이 생성되었습니다');
+      } else setRecoveryState('error');
     } catch { setRecoveryState('error'); }
   }
 
   async function handleGenerateMessage() {
     setMessageState('loading');
+    const start = Date.now();
     try {
       const res = await fetch(`/api/students/${id}/intervention-message`, {
         method: 'POST',
@@ -88,8 +97,12 @@ export default function StudentDetailPage() {
         body: JSON.stringify({ message_type: 'teacher' }),
       });
       const json = await res.json();
-      if (json.success) { setInterventionMsg(json.data); setMessageState('done'); }
-      else setMessageState('error');
+      if (json.success) {
+        setInterventionMsg(json.data);
+        setMessageState('done');
+        setMessageTime((Date.now() - start) / 1000);
+        toast('개입 메시지가 생성되었습니다');
+      } else setMessageState('error');
     } catch { setMessageState('error'); }
   }
 
@@ -98,12 +111,23 @@ export default function StudentDetailPage() {
     setSubmitState('idle');
     setSubmitResult(null);
     setAnswers({});
+    const start = Date.now();
     try {
       const res = await fetch(`/api/students/${id}/mini-assessment`, { method: 'POST' });
       const json = await res.json();
-      if (json.success) { setAssessment(json.data); setAssessmentState('done'); }
-      else setAssessmentState('error');
+      if (json.success) {
+        setAssessment(json.data);
+        setAssessmentState('done');
+        setAssessmentTime((Date.now() - start) / 1000);
+        toast('미니 진단이 생성되었습니다');
+      } else setAssessmentState('error');
     } catch { setAssessmentState('error'); }
+  }
+
+  async function handleGenerateAll() {
+    await handleGenerateRecovery();
+    await handleGenerateMessage();
+    await handleGenerateAssessment();
   }
 
   async function handleSubmitAssessment() {
@@ -122,7 +146,6 @@ export default function StudentDetailPage() {
       if (json.success) {
         setSubmitResult(json.data);
         setSubmitState('done');
-        // Update local risk data
         if (data) {
           setData({
             ...data,
@@ -133,6 +156,7 @@ export default function StudentDetailPage() {
             },
           });
         }
+        toast(`채점 완료 — ${json.data.score}/${json.data.total} 정답`);
       } else setSubmitState('error');
     } catch { setSubmitState('error'); }
   }
@@ -140,8 +164,7 @@ export default function StudentDetailPage() {
   async function handleCopy() {
     if (!interventionMsg) return;
     await navigator.clipboard.writeText(interventionMsg.content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    toast('메시지가 클립보드에 복사되었습니다');
   }
 
   // ─── Loading / Not Found ───
@@ -176,10 +199,12 @@ export default function StudentDetailPage() {
 
   const { student, progress: p } = data;
   const allAnswered = assessment?.questions_json.every(q => answers[q.id]?.trim());
+  const anyLoading = recoveryState === 'loading' || messageState === 'loading' || assessmentState === 'loading';
 
   return (
     <main className="flex-1 px-4 py-8 max-w-4xl mx-auto w-full space-y-6">
-      {/* Back link */}
+      <Toast message={toastMsg} />
+
       <Link href="/students" className="text-sm text-[#0075de] font-semibold hover:underline">
         &larr; 학생 목록
       </Link>
@@ -225,13 +250,35 @@ export default function StudentDetailPage() {
           <ActionButton label="회복학습 생성" state={recoveryState} onClick={handleGenerateRecovery} primary loadingText="플랜 생성 중..." />
           <ActionButton label="개입 메시지 생성" state={messageState} onClick={handleGenerateMessage} loadingText="메시지 작성 중..." />
           <ActionButton label="미니 진단 생성" state={assessmentState} onClick={handleGenerateAssessment} loadingText="진단 생성 중..." />
+          <button
+            onClick={handleGenerateAll}
+            disabled={anyLoading}
+            className="px-5 py-2.5 rounded font-semibold transition border border-[#0075de] text-[#0075de] hover:bg-[#0075de]/5 disabled:opacity-60"
+          >
+            {anyLoading ? '생성 중...' : '전체 생성'}
+          </button>
         </div>
       </section>
+
+      {/* ─── Loading Skeleton (AI 생성 중) ─── */}
+      {(recoveryState === 'loading' || messageState === 'loading' || assessmentState === 'loading') && (
+        <section className="space-y-4">
+          <div className="h-20 rounded-xl bg-[#f6f5f4] animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-28 rounded-xl bg-[#f6f5f4] animate-pulse" />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ─── Recovery Plan Display ─── */}
       {recoveryState === 'done' && recoveryPlan && (
         <section className="space-y-4">
-          <h2 className="text-lg font-bold tracking-tight">회복학습 플랜</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-bold tracking-tight">회복학습 플랜</h2>
+            {recoveryTime && <span className="text-xs text-[#a39e98]">{recoveryTime.toFixed(1)}초 만에 생성</span>}
+          </div>
           <div className="card p-5">
             <h3 className="text-sm font-semibold text-[#0075de] mb-2">놓친 개념 요약</h3>
             <p className="text-sm leading-relaxed">{recoveryPlan.missed_concepts_summary}</p>
@@ -265,7 +312,10 @@ export default function StudentDetailPage() {
       {/* ─── Intervention Message Display ─── */}
       {messageState === 'done' && interventionMsg && (
         <section className="space-y-3">
-          <h2 className="text-lg font-bold tracking-tight">개입 메시지</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-bold tracking-tight">개입 메시지</h2>
+            {messageTime && <span className="text-xs text-[#a39e98]">{messageTime.toFixed(1)}초 만에 생성</span>}
+          </div>
           <div className="rounded-xl bg-[#f6f5f4] p-5">
             <p className="text-sm leading-relaxed whitespace-pre-wrap">{interventionMsg.content}</p>
           </div>
@@ -273,7 +323,7 @@ export default function StudentDetailPage() {
             onClick={handleCopy}
             className="px-4 py-2 text-sm font-semibold rounded bg-black/5 hover:bg-black/10 transition"
           >
-            {copied ? '복사됨!' : '메시지 복사'}
+            메시지 복사
           </button>
         </section>
       )}
@@ -281,7 +331,10 @@ export default function StudentDetailPage() {
       {/* ─── Mini Assessment Display ─── */}
       {assessmentState === 'done' && assessment && submitState !== 'done' && (
         <section className="space-y-4">
-          <h2 className="text-lg font-bold tracking-tight">미니 진단</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-bold tracking-tight">미니 진단</h2>
+            {assessmentTime && <span className="text-xs text-[#a39e98]">{assessmentTime.toFixed(1)}초 만에 생성</span>}
+          </div>
           {assessment.questions_json.map(q => (
             <div key={q.id} className="card p-5">
               <p className="font-semibold text-sm mb-3">
@@ -328,16 +381,12 @@ export default function StudentDetailPage() {
       {submitState === 'done' && submitResult && assessment && (
         <section className="space-y-4">
           <h2 className="text-lg font-bold tracking-tight">진단 결과</h2>
-
-          {/* Score */}
           <div className="card p-6 text-center">
             <p className="text-4xl font-bold tracking-tight">
               {submitResult.score} <span className="text-lg text-[#a39e98]">/ {submitResult.total}</span>
             </p>
             <p className="mt-1 text-sm text-[#615d59]">정답 수</p>
           </div>
-
-          {/* Risk Score Change */}
           <div className="card p-5 flex items-center justify-center gap-4">
             <div className="text-center">
               <p className="text-sm text-[#a39e98]">변경 전</p>
@@ -351,14 +400,11 @@ export default function StudentDetailPage() {
               <RiskBadge level={submitResult.risk_level_after} size="sm" />
             </div>
           </div>
-
-          {/* Explanations */}
           {assessment.questions_json.map(q => {
             const correct = submitResult.correct_answers.find(a => a.id === q.id);
             const explanation = submitResult.explanations.find(e => e.id === q.id);
             const userAnswer = assessment.submitted_answers_json?.find(a => a.id === q.id);
             const isCorrect = userAnswer && correct && userAnswer.answer.trim() === correct.answer.trim();
-
             return (
               <div key={q.id} className="card p-5">
                 <p className="font-semibold text-sm mb-2">
@@ -379,7 +425,6 @@ export default function StudentDetailPage() {
         </section>
       )}
 
-      {/* Global card style */}
       <style jsx>{`
         .card {
           border-radius: 12px;
@@ -395,30 +440,18 @@ export default function StudentDetailPage() {
 // ─── Sub-component ───
 
 function ActionButton({
-  label,
-  state,
-  onClick,
-  primary = false,
-  loadingText,
+  label, state, onClick, primary = false, loadingText,
 }: {
-  label: string;
-  state: GenState;
-  onClick: () => void;
-  primary?: boolean;
-  loadingText: string;
+  label: string; state: GenState; onClick: () => void; primary?: boolean; loadingText: string;
 }) {
   const isLoading = state === 'loading';
   const base = primary
     ? 'bg-[#0075de] text-white hover:bg-[#005bab]'
     : 'bg-black/5 text-black/95 hover:bg-black/10';
-
   return (
     <div>
-      <button
-        onClick={onClick}
-        disabled={isLoading}
-        className={`px-5 py-2.5 rounded font-semibold transition disabled:opacity-60 ${base}`}
-      >
+      <button onClick={onClick} disabled={isLoading}
+        className={`px-5 py-2.5 rounded font-semibold transition disabled:opacity-60 ${base}`}>
         {isLoading ? loadingText : state === 'done' ? `${label} (재생성)` : label}
       </button>
       {state === 'error' && (
