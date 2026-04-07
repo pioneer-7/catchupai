@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { RiskBadge } from '@/components/RiskBadge';
 import { MetricCard } from '@/components/MetricCard';
 import { RiskFactorTag } from '@/components/RiskFactorTag';
-import { Toast, useToast } from '@/components/Toast';
+import { ToastContainer, useToast } from '@/components/Toast';
 import { ActivityTimeline } from '@/components/ActivityTimeline';
 import { exportRecoveryPlanPDF } from '@/lib/pdf-export';
 import type {
@@ -24,7 +24,7 @@ export default function StudentDetailPage() {
   const [data, setData] = useState<StudentDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const { message: toastMsg, toast } = useToast();
+  const { items: toastItems, toast, dismiss: dismissToast } = useToast();
 
   // AI generation states + timing
   const [recoveryState, setRecoveryState] = useState<GenState>('idle');
@@ -205,7 +205,7 @@ export default function StudentDetailPage() {
 
   return (
     <main className="flex-1 px-6 py-12 max-w-4xl mx-auto w-full space-y-8">
-      <Toast message={toastMsg} />
+      <ToastContainer items={toastItems} onDismiss={dismissToast} />
 
       <Link href="/students" className="text-sm text-[var(--accent)] font-semibold hover:underline">
         &larr; 학생 목록

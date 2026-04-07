@@ -8,6 +8,7 @@ import { KpiCard } from '@/components/KpiCard';
 import { RiskBadge } from '@/components/RiskBadge';
 import { FadeIn } from '@/components/FadeIn';
 import { RiskChart } from '@/components/RiskChart';
+import { EmptyState } from '@/components/EmptyState';
 import type { StudentListData } from '@/types';
 
 export default function DashboardPage() {
@@ -40,15 +41,13 @@ export default function DashboardPage() {
     return (
       <main className="flex-1 px-6 py-12 max-w-6xl mx-auto w-full">
         <h1 className="text-2xl heading-md mb-8">대시보드</h1>
-        <div className="card p-16 text-center">
-          <p className="text-[var(--text-secondary)] text-lg">아직 업로드된 데이터가 없습니다</p>
-          <Link
-            href="/upload"
-            className="mt-6 inline-block px-6 py-3 bg-[var(--accent)] text-white rounded-[var(--radius-button)] font-semibold hover:bg-[var(--accent-hover)] transition btn-press focus-ring"
-          >
-            데이터 업로드하기
-          </Link>
-        </div>
+        <EmptyState
+          icon="upload"
+          title="아직 업로드된 데이터가 없습니다"
+          description="학생 데이터를 업로드하면 위험도 분석과 AI 회복학습을 시작할 수 있습니다."
+          actionLabel="데이터 업로드하기"
+          actionHref="/upload"
+        />
       </main>
     );
   }

@@ -6,6 +6,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { RiskBadge } from '@/components/RiskBadge';
+import { EmptyState } from '@/components/EmptyState';
 import type { StudentListData, RiskLevel } from '@/types';
 
 const RISK_FILTERS: { value: RiskLevel | 'all'; label: string }[] = [
@@ -92,11 +93,16 @@ export default function StudentsPage() {
           ))}
         </div>
       ) : !data || data.students.length === 0 ? (
-        <div className="card p-16 text-center">
-          <p className="text-[var(--text-secondary)]">
-            {search || riskFilter !== 'all' ? '검색 결과가 없습니다' : '학생 데이터가 없습니다'}
-          </p>
-        </div>
+        <EmptyState
+          icon={search || riskFilter !== 'all' ? 'search' : 'students'}
+          title={search || riskFilter !== 'all' ? '검색 결과가 없습니다' : '학생 데이터가 없습니다'}
+          description={search || riskFilter !== 'all'
+            ? '다른 검색어나 필터를 사용해보세요.'
+            : '샘플 데이터를 로드하거나 CSV를 업로드해주세요.'
+          }
+          actionLabel={search || riskFilter !== 'all' ? undefined : '데이터 업로드하기'}
+          actionHref={search || riskFilter !== 'all' ? undefined : '/upload'}
+        />
       ) : (
         <div className="overflow-x-auto card">
           <table className="w-full text-sm">
