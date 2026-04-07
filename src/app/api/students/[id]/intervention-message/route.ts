@@ -14,7 +14,7 @@ export async function POST(
   const { id } = await params;
 
   try {
-    const data = getStudentDetail(id);
+    const data = await getStudentDetail(id);
     if (!data) return errorResponse('NOT_FOUND', '학생을 찾을 수 없습니다', 404);
 
     let messageType: 'teacher' | 'operator' | 'student_support' = 'teacher';
@@ -25,7 +25,7 @@ export async function POST(
       // no body — use default
     }
 
-    const course = getFirstCourse();
+    const course = await getFirstCourse();
     const ctx = buildAiContext(data.student, data.progress, course);
     const conceptsSummary = data.recovery_plans[0]?.missed_concepts_summary;
     const result = await generateInterventionMessage(ctx, conceptsSummary);
@@ -39,7 +39,7 @@ export async function POST(
       created_at: new Date().toISOString(),
     };
 
-    addInterventionMessage(msg);
+    await addInterventionMessage(msg);
     return successResponse(msg);
   } catch (error) {
     console.error('Intervention message error:', error);

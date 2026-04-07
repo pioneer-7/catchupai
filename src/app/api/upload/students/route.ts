@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       return errorResponse('VALIDATION_ERROR', `필수 컬럼이 누락되었습니다: ${missing.join(', ')}`, 400);
     }
 
-    const course = getOrCreateDefaultCourse();
+    const course = await getOrCreateDefaultCourse();
     let processed = 0;
     let skipped = 0;
 
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
         continue;
       }
 
-      upsertStudentWithProgress({
+      await upsertStudentWithProgress({
         name: row.student_name,
         email: row.email || undefined,
         cohort_name: row.cohort_name || undefined,

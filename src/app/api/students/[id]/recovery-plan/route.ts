@@ -14,10 +14,10 @@ export async function POST(
   const { id } = await params;
 
   try {
-    const data = getStudentDetail(id);
+    const data = await getStudentDetail(id);
     if (!data) return errorResponse('NOT_FOUND', '학생을 찾을 수 없습니다', 404);
 
-    const course = getFirstCourse();
+    const course = await getFirstCourse();
     const ctx = buildAiContext(data.student, data.progress, course);
     const result = await generateRecoveryPlan(ctx);
 
@@ -32,7 +32,7 @@ export async function POST(
       created_at: new Date().toISOString(),
     };
 
-    addRecoveryPlan(plan);
+    await addRecoveryPlan(plan);
     return successResponse(plan);
   } catch (error) {
     console.error('Recovery plan error:', error);

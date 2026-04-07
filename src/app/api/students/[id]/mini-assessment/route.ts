@@ -14,10 +14,10 @@ export async function POST(
   const { id } = await params;
 
   try {
-    const data = getStudentDetail(id);
+    const data = await getStudentDetail(id);
     if (!data) return errorResponse('NOT_FOUND', '학생을 찾을 수 없습니다', 404);
 
-    const course = getFirstCourse();
+    const course = await getFirstCourse();
     const ctx = buildAiContext(data.student, data.progress, course);
     const conceptsSummary = data.recovery_plans[0]?.missed_concepts_summary || '최근 수업에서 다룬 핵심 개념';
     const result = await generateMiniAssessment(ctx, conceptsSummary);
@@ -35,7 +35,7 @@ export async function POST(
       created_at: new Date().toISOString(),
     };
 
-    addMiniAssessment(assessment);
+    await addMiniAssessment(assessment);
     return successResponse(assessment);
   } catch (error) {
     console.error('Mini assessment error:', error);

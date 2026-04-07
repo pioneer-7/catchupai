@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const sort = searchParams.get('sort') || 'risk_score';
   const order = (searchParams.get('order') || 'desc') as 'asc' | 'desc';
 
-  const data = getStudentList({
+  const data = await getStudentList({
     risk_level: risk_level || undefined,
     search,
     sort,

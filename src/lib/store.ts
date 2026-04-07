@@ -1,6 +1,7 @@
-// 인메모리 데이터 스토어 (globalThis 싱글턴)
-// MVP 데모용 — Supabase 어댑터는 Day 4+ 에서 추가
+// Supabase 기반 데이터 스토어
+// 서버리스 환경(Vercel)에서 인스턴스 간 데이터 공유를 위해 Supabase 직접 사용
 
+import { createClient } from '@supabase/supabase-js';
 import type {
   Course, Student, StudentProgress, RecoveryPlan,
   InterventionMessage, MiniAssessment, StudentListData,
@@ -9,96 +10,62 @@ import type {
 import { calculateRisk } from '@/lib/risk-scoring';
 import { SAMPLE_COURSE, SAMPLE_STUDENTS, SAMPLE_MATERIAL_TEXT } from '@/lib/sample-data';
 
-interface Store {
-  courses: Map<string, Course>;
-  students: Map<string, Student>;
-  progress: Map<string, StudentProgress>; // key: `${student_id}_${course_id}`
-  recoveryPlans: Map<string, RecoveryPlan[]>; // key: student_id
-  interventionMessages: Map<string, InterventionMessage[]>;
-  miniAssessments: Map<string, MiniAssessment[]>;
-}
+// Supabase 클라이언트 (서버 사이드 — service role key 우선)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const db = createClient(supabaseUrl, supabaseKey);
 
-function generateId(): string {
-  return crypto.randomUUID();
-}
+// === Public API (모두 async) ===
 
-function createStore(): Store {
-  return {
-    courses: new Map(),
-    students: new Map(),
-    progress: new Map(),
-    recoveryPlans: new Map(),
-    interventionMessages: new Map(),
-    miniAssessments: new Map(),
-  };
-}
+export async function loadSampleData(): Promise<{ course_id: string; total_rows: number }> {
+  // 기존 데이터 정리
+  await db.from('mini_assessments').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  await db.from('intervention_messages').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  await db.from('recovery_plans').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  await db.from('student_progress').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  await db.from('students').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  await db.from('courses').delete().neq('id', '00000000-0000-0000-0000-000000000000');
 
-// globalThis로 핫리로드 시에도 데이터 유지
-const g = globalThis as unknown as { __catchupStore?: Store };
-if (!g.__catchupStore) {
-  g.__catchupStore = createStore();
-}
-const store = g.__catchupStore;
-
-// === Public API ===
-
-export function isLoaded(): boolean {
-  return store.students.size > 0;
-}
-
-export function clear(): void {
-  store.courses.clear();
-  store.students.clear();
-  store.progress.clear();
-  store.recoveryPlans.clear();
-  store.interventionMessages.clear();
-  store.miniAssessments.clear();
-}
-
-export function loadSampleData(): { course_id: string; total_rows: number } {
-  clear();
-
-  const courseId = generateId();
-  const course: Course = {
-    id: courseId,
+  // 과정 생성
+  const { data: course } = await db.from('courses').insert({
     title: SAMPLE_COURSE.title,
     description: SAMPLE_COURSE.description,
     uploaded_material_text: SAMPLE_MATERIAL_TEXT,
-    created_at: new Date().toISOString(),
-  };
-  store.courses.set(courseId, course);
+  }).select().single();
 
+  const courseId = course!.id;
+
+  // 학생 + progress 생성
   for (const s of SAMPLE_STUDENTS) {
-    upsertStudentWithProgress(s, courseId);
+    await upsertStudentWithProgress(s, courseId);
   }
 
   return { course_id: courseId, total_rows: SAMPLE_STUDENTS.length };
 }
 
-export function getOrCreateDefaultCourse(): Course {
-  const existing = Array.from(store.courses.values())[0];
-  if (existing) return existing;
+export async function getOrCreateDefaultCourse(): Promise<Course> {
+  const { data } = await db.from('courses').select('*').limit(1).single();
+  if (data) return data as Course;
 
-  const id = generateId();
-  const course: Course = {
-    id,
+  const { data: created } = await db.from('courses').insert({
     title: '기본 과정',
     description: null,
     uploaded_material_text: null,
-    created_at: new Date().toISOString(),
-  };
-  store.courses.set(id, course);
-  return course;
+  }).select().single();
+
+  return created as Course;
 }
 
-export function updateCourseMaterial(courseId: string, text: string): Course | null {
-  const course = store.courses.get(courseId);
-  if (!course) return null;
-  course.uploaded_material_text = text;
-  return course;
+export async function updateCourseMaterial(courseId: string, text: string): Promise<Course | null> {
+  const { data } = await db.from('courses')
+    .update({ uploaded_material_text: text })
+    .eq('id', courseId)
+    .select()
+    .single();
+  return data as Course | null;
 }
 
-export function upsertStudentWithProgress(
+export async function upsertStudentWithProgress(
   data: {
     name: string;
     email?: string;
@@ -110,21 +77,30 @@ export function upsertStudentWithProgress(
     last_active_days_ago: number;
   },
   courseId: string
-): { student: Student; progress: StudentProgress } {
-  // Find or create student by name
-  let student = Array.from(store.students.values()).find(s => s.name === data.name);
+): Promise<{ student: Student; progress: StudentProgress }> {
+  // Find or create student
+  let { data: student } = await db.from('students')
+    .select('*')
+    .eq('name', data.name)
+    .limit(1)
+    .single();
+
   if (!student) {
-    student = {
-      id: generateId(),
+    const { data: created } = await db.from('students').insert({
       name: data.name,
       email: data.email || null,
       cohort_name: data.cohort_name || null,
-      created_at: new Date().toISOString(),
-    };
-    store.students.set(student.id, student);
+    }).select().single();
+    student = created;
   } else {
-    if (data.email) student.email = data.email;
-    if (data.cohort_name) student.cohort_name = data.cohort_name;
+    if (data.email || data.cohort_name) {
+      await db.from('students')
+        .update({
+          ...(data.email && { email: data.email }),
+          ...(data.cohort_name && { cohort_name: data.cohort_name }),
+        })
+        .eq('id', student.id);
+    }
   }
 
   // Calculate risk
@@ -136,143 +112,217 @@ export function upsertStudentWithProgress(
     last_active_days_ago: data.last_active_days_ago,
   });
 
-  const progressKey = `${student.id}_${courseId}`;
-  const now = new Date().toISOString();
+  // Upsert progress
+  const { data: existingProgress } = await db.from('student_progress')
+    .select('id')
+    .eq('student_id', student!.id)
+    .eq('course_id', courseId)
+    .limit(1)
+    .single();
 
-  const progress: StudentProgress = {
-    id: store.progress.has(progressKey) ? store.progress.get(progressKey)!.id : generateId(),
-    student_id: student.id,
-    course_id: courseId,
-    attendance_rate: data.attendance_rate,
-    missed_sessions: data.missed_sessions,
-    assignment_submission_rate: data.assignment_submission_rate,
-    avg_quiz_score: data.avg_quiz_score,
-    last_active_days_ago: data.last_active_days_ago,
-    risk_score: risk.risk_score,
-    risk_level: risk.risk_level,
-    risk_factors_json: risk.risk_factors,
-    created_at: store.progress.has(progressKey) ? store.progress.get(progressKey)!.created_at : now,
-    updated_at: now,
-  };
-  store.progress.set(progressKey, progress);
+  let progress: StudentProgress;
 
-  return { student, progress };
+  if (existingProgress) {
+    const { data: updated } = await db.from('student_progress')
+      .update({
+        attendance_rate: data.attendance_rate,
+        missed_sessions: data.missed_sessions,
+        assignment_submission_rate: data.assignment_submission_rate,
+        avg_quiz_score: data.avg_quiz_score,
+        last_active_days_ago: data.last_active_days_ago,
+        risk_score: risk.risk_score,
+        risk_level: risk.risk_level,
+        risk_factors_json: risk.risk_factors,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', existingProgress.id)
+      .select()
+      .single();
+    progress = updated as StudentProgress;
+  } else {
+    const { data: created } = await db.from('student_progress')
+      .insert({
+        student_id: student!.id,
+        course_id: courseId,
+        attendance_rate: data.attendance_rate,
+        missed_sessions: data.missed_sessions,
+        assignment_submission_rate: data.assignment_submission_rate,
+        avg_quiz_score: data.avg_quiz_score,
+        last_active_days_ago: data.last_active_days_ago,
+        risk_score: risk.risk_score,
+        risk_level: risk.risk_level,
+        risk_factors_json: risk.risk_factors,
+      })
+      .select()
+      .single();
+    progress = created as StudentProgress;
+  }
+
+  return { student: student as Student, progress };
 }
 
-export function getStudentList(filters?: {
+export async function getStudentList(filters?: {
   risk_level?: RiskLevel;
   search?: string;
   sort?: string;
   order?: 'asc' | 'desc';
-}): StudentListData {
-  let entries = Array.from(store.progress.values()).map(p => {
-    const student = store.students.get(p.student_id)!;
+}): Promise<StudentListData> {
+  // Join students + progress
+  let query = db.from('student_progress')
+    .select('*, students!inner(id, name, email, cohort_name, created_at)');
+
+  if (filters?.risk_level) {
+    query = query.eq('risk_level', filters.risk_level);
+  }
+
+  if (filters?.search) {
+    query = query.ilike('students.name', `%${filters.search}%`);
+  }
+
+  const sortKey = filters?.sort || 'risk_score';
+  const ascending = (filters?.order || 'desc') === 'asc';
+  query = query.order(sortKey, { ascending });
+
+  const { data: rows } = await query;
+
+  const students = (rows || []).map((row: Record<string, unknown>) => {
+    const s = row.students as Record<string, unknown>;
     return {
-      id: student.id,
-      name: student.name,
-      email: student.email,
-      cohort_name: student.cohort_name,
-      created_at: student.created_at,
-      risk_score: p.risk_score,
-      risk_level: p.risk_level,
-      attendance_rate: p.attendance_rate,
-      missed_sessions: p.missed_sessions,
-      assignment_submission_rate: p.assignment_submission_rate,
-      avg_quiz_score: p.avg_quiz_score,
-      last_active_days_ago: p.last_active_days_ago,
+      id: s.id as string,
+      name: s.name as string,
+      email: s.email as string | null,
+      cohort_name: s.cohort_name as string | null,
+      created_at: s.created_at as string,
+      risk_score: row.risk_score as number,
+      risk_level: row.risk_level as RiskLevel,
+      attendance_rate: row.attendance_rate as number,
+      missed_sessions: row.missed_sessions as number,
+      assignment_submission_rate: row.assignment_submission_rate as number,
+      avg_quiz_score: row.avg_quiz_score as number,
+      last_active_days_ago: row.last_active_days_ago as number,
     };
   });
 
-  // Filter by risk_level
-  if (filters?.risk_level) {
-    entries = entries.filter(e => e.risk_level === filters.risk_level);
-  }
-
-  // Filter by search (name)
-  if (filters?.search) {
-    const q = filters.search.toLowerCase();
-    entries = entries.filter(e => e.name.toLowerCase().includes(q));
-  }
-
-  // Sort
-  const sortKey = filters?.sort || 'risk_score';
-  const order = filters?.order || 'desc';
-  entries.sort((a, b) => {
-    const aVal = (a as Record<string, unknown>)[sortKey];
-    const bVal = (b as Record<string, unknown>)[sortKey];
-    if (typeof aVal === 'number' && typeof bVal === 'number') {
-      return order === 'desc' ? bVal - aVal : aVal - bVal;
-    }
-    return order === 'desc'
-      ? String(bVal).localeCompare(String(aVal))
-      : String(aVal).localeCompare(String(bVal));
-  });
-
-  // Summary
-  const allProgress = Array.from(store.progress.values());
+  // Summary (전체 기준)
+  const { data: allProgress } = await db.from('student_progress').select('risk_level');
+  const all = allProgress || [];
   const summary = {
-    stable: allProgress.filter(p => p.risk_level === 'stable').length,
-    warning: allProgress.filter(p => p.risk_level === 'warning').length,
-    at_risk: allProgress.filter(p => p.risk_level === 'at_risk').length,
+    stable: all.filter((p: Record<string, unknown>) => p.risk_level === 'stable').length,
+    warning: all.filter((p: Record<string, unknown>) => p.risk_level === 'warning').length,
+    at_risk: all.filter((p: Record<string, unknown>) => p.risk_level === 'at_risk').length,
   };
 
-  return { students: entries, total: entries.length, summary };
+  return { students, total: students.length, summary };
 }
 
-export function getStudentDetail(studentId: string): StudentDetailData | null {
-  const student = store.students.get(studentId);
+export async function getStudentDetail(studentId: string): Promise<StudentDetailData | null> {
+  const { data: student } = await db.from('students')
+    .select('*')
+    .eq('id', studentId)
+    .single();
   if (!student) return null;
 
-  const progress = Array.from(store.progress.values()).find(p => p.student_id === studentId);
+  const { data: progress } = await db.from('student_progress')
+    .select('*')
+    .eq('student_id', studentId)
+    .single();
   if (!progress) return null;
 
+  const { data: recovery_plans } = await db.from('recovery_plans')
+    .select('*')
+    .eq('student_id', studentId)
+    .order('created_at', { ascending: false });
+
+  const { data: intervention_messages } = await db.from('intervention_messages')
+    .select('*')
+    .eq('student_id', studentId)
+    .order('created_at', { ascending: false });
+
+  const { data: mini_assessments } = await db.from('mini_assessments')
+    .select('*')
+    .eq('student_id', studentId)
+    .order('created_at', { ascending: false });
+
   return {
-    student,
-    progress,
-    recovery_plans: store.recoveryPlans.get(studentId) || [],
-    intervention_messages: store.interventionMessages.get(studentId) || [],
-    mini_assessments: store.miniAssessments.get(studentId) || [],
+    student: student as Student,
+    progress: progress as StudentProgress,
+    recovery_plans: (recovery_plans || []) as RecoveryPlan[],
+    intervention_messages: (intervention_messages || []) as InterventionMessage[],
+    mini_assessments: (mini_assessments || []) as MiniAssessment[],
   };
 }
 
-export function getFirstCourse(): Course | null {
-  return Array.from(store.courses.values())[0] || null;
+export async function getFirstCourse(): Promise<Course | null> {
+  const { data } = await db.from('courses').select('*').limit(1).single();
+  return (data as Course) || null;
 }
 
-export function addRecoveryPlan(plan: RecoveryPlan): void {
-  const list = store.recoveryPlans.get(plan.student_id) || [];
-  list.unshift(plan);
-  store.recoveryPlans.set(plan.student_id, list);
+export async function addRecoveryPlan(plan: RecoveryPlan): Promise<void> {
+  await db.from('recovery_plans').insert({
+    id: plan.id,
+    student_id: plan.student_id,
+    course_id: plan.course_id,
+    missed_concepts_summary: plan.missed_concepts_summary,
+    recovery_steps_json: plan.recovery_steps_json,
+    action_plan_text: plan.action_plan_text,
+    caution_points_text: plan.caution_points_text,
+  });
 }
 
-export function addInterventionMessage(msg: InterventionMessage): void {
-  const list = store.interventionMessages.get(msg.student_id) || [];
-  list.unshift(msg);
-  store.interventionMessages.set(msg.student_id, list);
+export async function addInterventionMessage(msg: InterventionMessage): Promise<void> {
+  await db.from('intervention_messages').insert({
+    id: msg.id,
+    student_id: msg.student_id,
+    course_id: msg.course_id,
+    message_type: msg.message_type,
+    content: msg.content,
+  });
 }
 
-export function addMiniAssessment(assessment: MiniAssessment): void {
-  const list = store.miniAssessments.get(assessment.student_id) || [];
-  list.unshift(assessment);
-  store.miniAssessments.set(assessment.student_id, list);
+export async function addMiniAssessment(assessment: MiniAssessment): Promise<void> {
+  await db.from('mini_assessments').insert({
+    id: assessment.id,
+    student_id: assessment.student_id,
+    course_id: assessment.course_id,
+    questions_json: assessment.questions_json,
+    answer_key_json: assessment.answer_key_json,
+    explanation_json: assessment.explanation_json,
+  });
 }
 
-export function getMiniAssessment(studentId: string, assessmentId: string): MiniAssessment | null {
-  const list = store.miniAssessments.get(studentId) || [];
-  return list.find(a => a.id === assessmentId) || null;
+export async function getMiniAssessment(studentId: string, assessmentId: string): Promise<MiniAssessment | null> {
+  const { data } = await db.from('mini_assessments')
+    .select('*')
+    .eq('id', assessmentId)
+    .eq('student_id', studentId)
+    .single();
+  return (data as MiniAssessment) || null;
 }
 
-export function updateMiniAssessment(studentId: string, assessmentId: string, updates: Partial<MiniAssessment>): MiniAssessment | null {
-  const assessment = getMiniAssessment(studentId, assessmentId);
-  if (!assessment) return null;
-  Object.assign(assessment, updates);
-  return assessment;
+export async function updateMiniAssessment(
+  studentId: string,
+  assessmentId: string,
+  updates: Partial<MiniAssessment>
+): Promise<MiniAssessment | null> {
+  const { data } = await db.from('mini_assessments')
+    .update(updates)
+    .eq('id', assessmentId)
+    .eq('student_id', studentId)
+    .select()
+    .single();
+  return (data as MiniAssessment) || null;
 }
 
-export function updateProgress(studentId: string, courseId: string, updates: Partial<StudentProgress>): StudentProgress | null {
-  const key = `${studentId}_${courseId}`;
-  const p = store.progress.get(key);
-  if (!p) return null;
-  Object.assign(p, updates, { updated_at: new Date().toISOString() });
-  return p;
+export async function updateProgress(
+  studentId: string,
+  courseId: string,
+  updates: Partial<StudentProgress>
+): Promise<StudentProgress | null> {
+  const { data } = await db.from('student_progress')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('student_id', studentId)
+    .eq('course_id', courseId)
+    .select()
+    .single();
+  return (data as StudentProgress) || null;
 }

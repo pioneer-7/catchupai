@@ -24,10 +24,10 @@ export async function POST(
       return errorResponse('VALIDATION_ERROR', 'assessment_id와 answers가 필요합니다', 400);
     }
 
-    const data = getStudentDetail(id);
+    const data = await getStudentDetail(id);
     if (!data) return errorResponse('NOT_FOUND', '학생을 찾을 수 없습니다', 404);
 
-    const assessment = getMiniAssessment(id, assessment_id);
+    const assessment = await getMiniAssessment(id, assessment_id);
     if (!assessment) return errorResponse('NOT_FOUND', '진단을 찾을 수 없습니다', 404);
 
     // Grade: exact match comparison
@@ -40,7 +40,7 @@ export async function POST(
     }
 
     // Update assessment
-    updateMiniAssessment(id, assessment_id, {
+    await updateMiniAssessment(id, assessment_id, {
       submitted_answers_json: answers,
       score: correctCount,
       submitted_at: new Date().toISOString(),
@@ -53,7 +53,7 @@ export async function POST(
     const riskScoreAfter = Math.max(0, riskScoreBefore + delta);
     const riskLevelAfter = recalculateLevel(riskScoreAfter);
 
-    updateProgress(id, data.progress.course_id, {
+    await updateProgress(id, data.progress.course_id, {
       risk_score: riskScoreAfter,
       risk_level: riskLevelAfter,
     });

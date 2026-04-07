@@ -11,7 +11,7 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const data = getStudentDetail(id);
+  const data = await getStudentDetail(id);
 
   if (!data) {
     return errorResponse('NOT_FOUND', '학생을 찾을 수 없습니다', 404);

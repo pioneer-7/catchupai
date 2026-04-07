@@ -6,7 +6,7 @@ import { successResponse, errorResponse } from '@/lib/api-helpers';
 
 export async function POST() {
   try {
-    const result = loadSampleData();
+    const result = await loadSampleData();
     return successResponse({
       total_rows: result.total_rows,
       processed: result.total_rows,
