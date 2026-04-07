@@ -219,7 +219,8 @@ export default function StudentDetailPage() {
 
       {/* ─── Action Buttons ─── */}
       <section className="border-t border-black/10 pt-6">
-        <h2 className="text-sm font-semibold text-[#615d59] mb-4">AI 지원 액션</h2>
+        <h2 className="text-sm font-semibold text-[#615d59] mb-3">AI 지원 액션</h2>
+        <p className="text-xs text-[#a39e98] mb-4">AI 생성에는 약 5~10초가 소요됩니다</p>
         <div className="flex flex-wrap gap-3">
           <ActionButton label="회복학습 생성" state={recoveryState} onClick={handleGenerateRecovery} primary loadingText="플랜 생성 중..." />
           <ActionButton label="개입 메시지 생성" state={messageState} onClick={handleGenerateMessage} loadingText="메시지 작성 중..." />
