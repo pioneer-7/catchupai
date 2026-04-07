@@ -181,25 +181,34 @@ Risk factors: ${ctx.risk_factors}
 Requirements:
 - Focus on helping the student catch up quickly
 - Summarize missed concepts in simple language
-- Provide exactly 3 recovery steps
+- Provide exactly 3 recovery steps as objects with step, title, description fields
 - Provide a short 10-15 minute action plan
 - Provide caution points or common mistakes
 - Respond in Korean
-- Return valid JSON only`;
+- Return valid JSON only matching this exact structure:
+{"missed_concepts_summary":"string","recovery_steps":[{"step":1,"title":"string","description":"string"},{"step":2,"title":"string","description":"string"},{"step":3,"title":"string","description":"string"}],"action_plan_text":"string","caution_points_text":"string"}`;
 
   const raw = await callClaude(prompt);
   if (!raw) return FALLBACK_RECOVERY_PLAN;
 
-  const parsed = extractJson(raw);
-  if (
-    parsed &&
-    typeof parsed === 'object' &&
-    'missed_concepts_summary' in (parsed as Record<string, unknown>) &&
-    'recovery_steps' in (parsed as Record<string, unknown>) &&
-    Array.isArray((parsed as RecoveryPlanOutput).recovery_steps) &&
-    (parsed as RecoveryPlanOutput).recovery_steps.length === 3
-  ) {
-    return parsed as RecoveryPlanOutput;
+  const parsed = extractJson(raw) as Record<string, unknown> | null;
+  if (parsed && 'missed_concepts_summary' in parsed && 'recovery_steps' in parsed) {
+    const steps = parsed.recovery_steps;
+    // Normalize: if steps are strings, convert to objects
+    if (Array.isArray(steps) && steps.length >= 3) {
+      const normalizedSteps = steps.slice(0, 3).map((s, i) => {
+        if (typeof s === 'string') {
+          return { step: i + 1, title: `단계 ${i + 1}`, description: s };
+        }
+        return s as { step: number; title: string; description: string };
+      });
+      return {
+        missed_concepts_summary: String(parsed.missed_concepts_summary),
+        recovery_steps: normalizedSteps,
+        action_plan_text: String(parsed.action_plan_text || ''),
+        caution_points_text: String(parsed.caution_points_text || ''),
+      };
+    }
   }
 
   console.warn('[AI] Invalid recovery plan response, using fallback');
