@@ -80,6 +80,19 @@ const FALLBACK_ASSESSMENT: MiniAssessmentOutput = {
   ],
 };
 
+// ─── Prediction Fallback ───
+
+const FALLBACK_PREDICTION = {
+  dropout_risk_score: 0.5,
+  risk_level: 'medium' as const,
+  primary_risk_factors: ['데이터 기반 종합 평가'],
+  trajectory: 'stable' as const,
+  weeks_to_likely_dropout: null,
+  confidence_basis: 'insufficient_data',
+  intervention_impact: '추가 데이터 수집 후 정밀 평가 권장',
+  recommended_actions: ['학습 상태 모니터링 지속', '1주 후 재평가'],
+};
+
 // ─── Client ───
 
 function getClient(): Anthropic | null {
@@ -368,4 +381,63 @@ Requirements:
 
   console.warn('[AI] Invalid assessment response, using fallback');
   return FALLBACK_ASSESSMENT;
+}
+
+// ─── Risk Prediction ───
+// SSOT: specs/005-ai/prediction-spec.md
+
+export interface RiskPredictionOutput {
+  dropout_risk_score: number;
+  risk_level: 'critical' | 'high' | 'medium' | 'low';
+  primary_risk_factors: string[];
+  trajectory: 'improving' | 'stable' | 'declining' | 'critical_decline';
+  weeks_to_likely_dropout: number | null;
+  confidence_basis: string;
+  intervention_impact: string;
+  recommended_actions: string[];
+}
+
+export async function generateRiskPrediction(ctx: AiContext): Promise<RiskPredictionOutput> {
+  const prompt = `You are an educational risk assessment specialist.
+Analyze the following student behavioral data and output a structured JSON risk assessment.
+
+Student: ${ctx.student_name}
+Course: ${ctx.course_title}
+Attendance rate: ${ctx.attendance_rate}%
+Missed sessions: ${ctx.missed_sessions}
+Assignment submission rate: ${ctx.assignment_submission_rate}%
+Average quiz score: ${ctx.avg_quiz_score}
+Days since last active: ${ctx.last_active_days_ago}
+Current risk factors: ${ctx.risk_factors}
+Current risk score: ${ctx.risk_score}/100
+
+Output JSON matching this exact schema:
+{"dropout_risk_score":0.0-1.0,"risk_level":"critical|high|medium|low","primary_risk_factors":["string",max 3],"trajectory":"improving|stable|declining|critical_decline","weeks_to_likely_dropout":integer or null,"confidence_basis":"behavioral_signals_only","intervention_impact":"한국어 string","recommended_actions":["한국어 string",max 3]}
+
+Respond in Korean for string fields. Return valid JSON only.`;
+
+  const raw = await callClaude(prompt);
+  if (!raw) return FALLBACK_PREDICTION;
+
+  const parsed = extractJson(raw) as Record<string, unknown> | null;
+  if (
+    parsed &&
+    'dropout_risk_score' in parsed &&
+    'risk_level' in parsed &&
+    'primary_risk_factors' in parsed
+  ) {
+    return {
+      dropout_risk_score: Number(parsed.dropout_risk_score) || 0.5,
+      risk_level: (parsed.risk_level as RiskPredictionOutput['risk_level']) || 'medium',
+      primary_risk_factors: Array.isArray(parsed.primary_risk_factors) ? parsed.primary_risk_factors.map(String) : ['데이터 기반 평가'],
+      trajectory: (parsed.trajectory as RiskPredictionOutput['trajectory']) || 'stable',
+      weeks_to_likely_dropout: parsed.weeks_to_likely_dropout != null ? Number(parsed.weeks_to_likely_dropout) : null,
+      confidence_basis: String(parsed.confidence_basis || 'behavioral_signals_only'),
+      intervention_impact: String(parsed.intervention_impact || ''),
+      recommended_actions: Array.isArray(parsed.recommended_actions) ? parsed.recommended_actions.map(String) : [],
+    };
+  }
+
+  console.warn('[AI] Invalid prediction response, using fallback');
+  return FALLBACK_PREDICTION;
 }

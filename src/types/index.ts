@@ -143,6 +143,22 @@ export interface StudentDetailData {
   mini_assessments: MiniAssessment[];
 }
 
+// AI 이탈 위험 예측
+// SSOT: specs/005-ai/prediction-spec.md
+export interface RiskPrediction {
+  id: string;
+  student_id: string;
+  dropout_risk_score: number;
+  risk_level: 'critical' | 'high' | 'medium' | 'low';
+  primary_risk_factors: string[];
+  trajectory: 'improving' | 'stable' | 'declining' | 'critical_decline';
+  weeks_to_likely_dropout: number | null;
+  confidence_basis: string;
+  intervention_impact: string | null;
+  recommended_actions: string[];
+  created_at: string;
+}
+
 // 미니 진단 제출 응답
 export interface AssessmentSubmitData {
   score: number;

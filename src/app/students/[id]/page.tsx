@@ -13,7 +13,9 @@ import { ToastContainer, useToast } from '@/components/Toast';
 import { TabBar } from '@/components/TabBar';
 import { ActivityTimeline } from '@/components/ActivityTimeline';
 import { ChatBox } from '@/components/ChatBox';
+import { PredictionCard } from '@/components/PredictionCard';
 import { exportRecoveryPlanPDF } from '@/lib/pdf-export';
+import type { RiskPrediction } from '@/types';
 import type {
   StudentDetailData, RecoveryPlan, InterventionMessage,
   MiniAssessment, AssessmentSubmitData,
@@ -25,6 +27,7 @@ const TABS = [
   { id: 'recovery', label: '회복학습', icon: '📚' },
   { id: 'message', label: '메시지', icon: '💬' },
   { id: 'assessment', label: '미니 진단', icon: '✏️' },
+  { id: 'prediction', label: '이탈 예측', icon: '🔮' },
   { id: 'coaching', label: 'AI 어시스턴트', icon: '🎓' },
   { id: 'timeline', label: '활동 기록', icon: '📋' },
 ];
@@ -45,8 +48,11 @@ export default function StudentDetailPage() {
   const [recoveryTime, setRecoveryTime] = useState<number | null>(null);
   const [messageTime, setMessageTime] = useState<number | null>(null);
   const [assessmentTime, setAssessmentTime] = useState<number | null>(null);
+  const [predictionState, setPredictionState] = useState<GenState>('idle');
+  const [predictionTime, setPredictionTime] = useState<number | null>(null);
 
   // AI results
+  const [prediction, setPrediction] = useState<RiskPrediction | null>(null);
   const [recoveryPlan, setRecoveryPlan] = useState<RecoveryPlan | null>(null);
   const [interventionMsg, setInterventionMsg] = useState<InterventionMessage | null>(null);
   const [assessment, setAssessment] = useState<MiniAssessment | null>(null);
@@ -309,7 +315,25 @@ export default function StudentDetailPage() {
             </div>
           )}
 
-          {/* ── 탭 4: AI 코칭 ── */}
+          {/* ── 탭 4: 이탈 예측 ── */}
+          {activeTab === 'prediction' && (
+            <div className="space-y-6">
+              <GenButton label="이탈 위험 평가" state={predictionState} time={predictionTime} onClick={async () => {
+                setPredictionState('loading');
+                const start = Date.now();
+                try {
+                  const res = await fetch(`/api/students/${id}/prediction`, { method: 'POST' });
+                  const json = await res.json();
+                  if (json.success) { setPrediction(json.data); setPredictionState('done'); setPredictionTime((Date.now() - start) / 1000); toast('이탈 위험 평가 완료'); }
+                  else setPredictionState('error');
+                } catch { setPredictionState('error'); }
+              }} />
+              {predictionState === 'loading' && <Skeleton />}
+              {predictionState === 'done' && prediction && <PredictionCard prediction={prediction} />}
+            </div>
+          )}
+
+          {/* ── 탭 5: AI 어시스턴트 ── */}
           {activeTab === 'coaching' && <ChatBox studentId={id} />}
 
           {/* ── 탭 5: 활동 기록 ── */}
