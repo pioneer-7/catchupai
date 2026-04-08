@@ -38,7 +38,7 @@ export default function IntegrationPage() {
   }
 
   return (
-    <main className="flex-1 px-6 py-12 max-w-5xl mx-auto w-full">
+    <main className="flex-1 px-6 py-12 max-w-6xl mx-auto w-full">
       <h1 className="text-2xl heading-md mb-2">통합 가이드</h1>
       <p className="text-[var(--text-secondary)] mb-8">
         CatchUp AI 위젯을 기존 LMS, ERP, 교육 대시보드에 iframe으로 삽입하세요.
