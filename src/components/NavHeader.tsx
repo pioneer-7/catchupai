@@ -6,7 +6,8 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
-import { GraduationCap, LayoutDashboard, Users, BarChart3, Upload, Code2, ChevronDown, Menu, X, RefreshCw } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Users, BarChart3, Upload, Code2, ChevronDown, Menu, X, RefreshCw, LogOut, Settings } from 'lucide-react';
+import { useAuth } from '@/components/AuthProvider';
 
 const MAIN_LINKS = [
   { href: '/dashboard', label: '대시보드', icon: LayoutDashboard },
@@ -24,14 +25,18 @@ const DEV_LINKS = [
 export function NavHeader() {
   const pathname = usePathname();
   const router = useRouter();
+  const { user, requireAuth, signOut } = useAuth();
   const [resetting, setResetting] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [devOpen, setDevOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const devRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (devRef.current && !devRef.current.contains(e.target as Node)) setDevOpen(false);
+      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserMenuOpen(false);
     }
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -132,6 +137,39 @@ export function NavHeader() {
             <RefreshCw size={12} className={resetting ? 'animate-spin' : ''} />
             {resetting ? '리셋 중' : '데모 리셋'}
           </button>
+
+          <div className="w-px h-5 bg-[var(--border)] mx-1.5" />
+
+          {/* Auth buttons */}
+          {user ? (
+            <div ref={userRef} className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold text-white transition-transform hover:scale-105"
+                style={{ background: 'var(--gradient-accent)' }}
+              >
+                {user.email?.[0]?.toUpperCase() || 'U'}
+              </button>
+              {userMenuOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-52 card card-deep p-1.5 bg-white border border-[var(--border)]">
+                  <div className="px-3 py-2 border-b border-[var(--border)] mb-1">
+                    <p className="text-[12px] text-[var(--text-muted)]" style={{ fontWeight: 510 }}>로그인됨</p>
+                    <p className="text-[13px] truncate">{user.email}</p>
+                  </div>
+                  <button onClick={() => { setUserMenuOpen(false); signOut(); }}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-[13px] rounded-[var(--radius-button)] text-[var(--status-risk)] hover:bg-[var(--status-risk-bg)] transition-all text-left"
+                    style={{ fontWeight: 510 }}>
+                    <LogOut size={14} /> 로그아웃
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button onClick={() => requireAuth()} className="btn-ghost text-[13px] py-1.5 px-3">Login</button>
+              <button onClick={() => requireAuth()} className="btn-primary text-[13px] py-1.5 px-3">Sign Up</button>
+            </div>
+          )}
         </div>
 
         {/* Mobile hamburger */}
