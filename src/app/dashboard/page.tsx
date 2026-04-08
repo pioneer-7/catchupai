@@ -9,6 +9,7 @@ import { RiskBadge } from '@/components/RiskBadge';
 import { FadeIn } from '@/components/FadeIn';
 import { RiskChart } from '@/components/RiskChart';
 import { EmptyState } from '@/components/EmptyState';
+import { Users, CheckCircle, AlertTriangle, XCircle, ArrowRight } from 'lucide-react';
 import type { StudentListData } from '@/types';
 
 export default function DashboardPage() {
@@ -60,10 +61,10 @@ export default function DashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-        <FadeIn delay={0}><KpiCard title="전체 학생" value={data.total} color="gray" /></FadeIn>
-        <FadeIn delay={60}><KpiCard title="안정" value={data.summary.stable} color="green" /></FadeIn>
-        <FadeIn delay={120}><KpiCard title="주의" value={data.summary.warning} color="amber" /></FadeIn>
-        <FadeIn delay={180}><KpiCard title="위험" value={data.summary.at_risk} color="red" /></FadeIn>
+        <FadeIn delay={0}><KpiCard title="전체 학생" value={data.total} color="gray" icon={Users} /></FadeIn>
+        <FadeIn delay={60}><KpiCard title="안정" value={data.summary.stable} color="green" icon={CheckCircle} /></FadeIn>
+        <FadeIn delay={120}><KpiCard title="주의" value={data.summary.warning} color="amber" icon={AlertTriangle} /></FadeIn>
+        <FadeIn delay={180}><KpiCard title="위험" value={data.summary.at_risk} color="red" icon={XCircle} /></FadeIn>
       </div>
 
       {/* Risk Distribution Chart */}
@@ -99,9 +100,9 @@ export default function DashboardPage() {
 
       <Link
         href="/students"
-        className="inline-block px-6 py-3 rounded-[var(--radius-button)] font-semibold bg-[var(--bg-warm)] text-[var(--text-primary)] hover:bg-[var(--bg-warm-hover)] transition btn-press focus-ring"
+        className="btn-secondary inline-flex items-center gap-2"
       >
-        학생 전체 보기
+        학생 전체 보기 <ArrowRight size={14} />
       </Link>
     </main>
   );

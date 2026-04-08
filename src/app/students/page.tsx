@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { RiskBadge } from '@/components/RiskBadge';
 import { EmptyState } from '@/components/EmptyState';
+import { ChevronDown, ChevronUp, ChevronsUpDown, ArrowRight, Users } from 'lucide-react';
 import type { StudentListData, RiskLevel } from '@/types';
 
 const RISK_FILTERS: { value: RiskLevel | 'all'; label: string }[] = [
@@ -51,13 +52,22 @@ export default function StudentsPage() {
   }
 
   function SortIcon({ column }: { column: string }) {
-    if (sortKey !== column) return <span className="text-[var(--text-muted)] ml-1">&#x2195;</span>;
-    return <span className="text-[var(--accent)] ml-1">{sortOrder === 'desc' ? '↓' : '↑'}</span>;
+    if (sortKey !== column) return <ChevronsUpDown size={13} className="inline ml-1 text-[var(--text-muted)]" />;
+    return sortOrder === 'desc'
+      ? <ChevronDown size={13} className="inline ml-1 text-[var(--accent)]" />
+      : <ChevronUp size={13} className="inline ml-1 text-[var(--accent)]" />;
   }
 
   return (
     <main className="flex-1 px-6 py-12 max-w-6xl mx-auto w-full">
-      <h1 className="text-2xl heading-md mb-8">학생 목록</h1>
+      <div className="flex items-center gap-3 mb-8">
+        <h1 className="text-2xl heading-md">학생 목록</h1>
+        {data && (
+          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--bg-warm)] text-[13px] text-[var(--text-secondary)]" style={{ fontWeight: 510 }}>
+            <Users size={13} /> {data.total}명
+          </span>
+        )}
+      </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -106,22 +116,22 @@ export default function StudentsPage() {
       ) : (
         <div className="overflow-x-auto card">
           <table className="w-full text-sm">
-            <thead>
+            <thead className="sticky top-14 z-10">
               <tr className="bg-[var(--bg-warm)] text-left text-[var(--text-secondary)]">
-                <th className="px-5 py-4 font-semibold">이름</th>
-                <th className="px-5 py-4 font-semibold">상태</th>
-                <th className="px-5 py-4 font-semibold cursor-pointer select-none" onClick={() => toggleSort('risk_score')}>
+                <th className="px-5 py-3" style={{ fontWeight: 510, fontSize: 13 }}>이름</th>
+                <th className="px-5 py-3" style={{ fontWeight: 510, fontSize: 13 }}>상태</th>
+                <th className="px-5 py-3 cursor-pointer select-none" style={{ fontWeight: 510, fontSize: 13 }} onClick={() => toggleSort('risk_score')}>
                   위험 점수<SortIcon column="risk_score" />
                 </th>
-                <th className="px-5 py-4 font-semibold cursor-pointer select-none" onClick={() => toggleSort('missed_sessions')}>
+                <th className="px-5 py-3 cursor-pointer select-none" style={{ fontWeight: 510, fontSize: 13 }} onClick={() => toggleSort('missed_sessions')}>
                   결석<SortIcon column="missed_sessions" />
                 </th>
-                <th className="px-5 py-4 font-semibold">과제 제출률</th>
-                <th className="px-5 py-4 font-semibold">퀴즈 평균</th>
-                <th className="px-5 py-4 font-semibold cursor-pointer select-none" onClick={() => toggleSort('last_active_days_ago')}>
+                <th className="px-5 py-3" style={{ fontWeight: 510, fontSize: 13 }}>과제 제출률</th>
+                <th className="px-5 py-3" style={{ fontWeight: 510, fontSize: 13 }}>퀴즈 평균</th>
+                <th className="px-5 py-3 cursor-pointer select-none" style={{ fontWeight: 510, fontSize: 13 }} onClick={() => toggleSort('last_active_days_ago')}>
                   최근 활동<SortIcon column="last_active_days_ago" />
                 </th>
-                <th className="px-5 py-4 font-semibold text-right">액션</th>
+                <th className="px-5 py-3 text-right" style={{ fontWeight: 510, fontSize: 13 }}></th>
               </tr>
             </thead>
             <tbody>
@@ -142,9 +152,10 @@ export default function StudentsPage() {
                   <td className="px-5 py-4 text-right">
                     <Link
                       href={`/students/${s.id}`}
-                      className="text-[var(--accent)] font-semibold hover:underline focus-ring rounded"
+                      className="inline-flex items-center gap-1 text-[var(--accent)] hover:gap-2 transition-all focus-ring rounded"
+                      style={{ fontWeight: 510, fontSize: 13 }}
                     >
-                      상세 보기
+                      상세 <ArrowRight size={13} />
                     </Link>
                   </td>
                 </tr>
