@@ -167,7 +167,9 @@ async function run() {
     // 미니 진단 + 제출 + 결과
     const assessBtn = await page.$('button:has-text("미니 진단")');
     await assessBtn.click();
-    await page.waitForTimeout(15000);
+    // 진단 문항 렌더링 대기 (AI 호출 ~15초)
+    await page.waitForSelector('input[type="radio"]', { timeout: 30000 }).catch(() => null);
+    await page.waitForTimeout(1000);
 
     // 문항 응답
     const radios = await page.$$('input[type="radio"]');
@@ -182,7 +184,8 @@ async function run() {
     const submitBtn = await page.$('button:has-text("답안 제출")');
     if (submitBtn && !(await submitBtn.isDisabled())) {
       await submitBtn.click();
-      await page.waitForTimeout(3000);
+      await page.waitForSelector('text=진단 결과', { timeout: 10000 }).catch(() => null);
+      await page.waitForTimeout(1000);
 
       // 채점 결과 확인
       const resultText = await page.textContent('main');
