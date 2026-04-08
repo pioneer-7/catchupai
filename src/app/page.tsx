@@ -61,10 +61,13 @@ export default function LandingPage() {
           <p className="mt-6 text-lg md:text-xl leading-relaxed text-[var(--text-secondary)] max-w-lg mx-auto">
             학생이 이탈하기 전에, 교육 현장이 먼저 개입할 수 있도록.
           </p>
-          <div className="mt-10 flex gap-3 justify-center">
+          <div className="mt-10 flex gap-3 justify-center flex-wrap">
             <SampleDataButton />
             <Link href="/upload" className="btn-secondary flex items-center gap-2">
               파일 업로드
+            </Link>
+            <Link href="/pricing" className="btn-ghost flex items-center gap-1 text-[var(--accent)]">
+              가격 보기 →
             </Link>
           </div>
         </div>
