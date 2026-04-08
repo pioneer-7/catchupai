@@ -8,6 +8,7 @@ import { DropoutFunnel } from '@/components/DropoutFunnel';
 import { CohortRiskChart } from '@/components/CohortRiskChart';
 import { InterventionEffectChart } from '@/components/InterventionEffectChart';
 import { FadeIn } from '@/components/FadeIn';
+import { TrendingUp, TrendingDown, Award } from 'lucide-react';
 
 interface AnalyticsData {
   funnel: { enrolled: number; risk_detected: number; intervention_sent: number; recovered: number; still_at_risk: number; dropped: number };
@@ -69,18 +70,33 @@ export default function AnalyticsPage() {
       {/* Summary Stat Boxes */}
       <FadeIn>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="stat-box">
-            <div className="stat-box-label">회복률</div>
+          <div className="stat-box border-l-4 border-l-[var(--status-stable)]">
+            <div className="flex items-center justify-between">
+              <div className="stat-box-label">회복률</div>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--status-stable-bg)' }}>
+                <TrendingUp size={16} style={{ color: 'var(--status-stable)' }} strokeWidth={1.8} />
+              </div>
+            </div>
             <div className="stat-box-value" style={{ color: 'var(--status-stable)' }}>{recoveryRate}%</div>
             <div className="stat-box-change positive">개입 학생 중 {data.funnel.recovered}명 회복</div>
           </div>
-          <div className="stat-box">
-            <div className="stat-box-label">평균 위험도 감소</div>
+          <div className="stat-box border-l-4 border-l-[var(--accent)]">
+            <div className="flex items-center justify-between">
+              <div className="stat-box-label">평균 위험도 감소</div>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--accent-light)' }}>
+                <TrendingDown size={16} style={{ color: 'var(--accent)' }} strokeWidth={1.8} />
+              </div>
+            </div>
             <div className="stat-box-value" style={{ color: 'var(--accent)' }}>-{avgReduction}</div>
             <div className="stat-box-change positive">개입 후 평균 risk score 변화</div>
           </div>
-          <div className="stat-box">
-            <div className="stat-box-label">가장 개선된 학생</div>
+          <div className="stat-box border-l-4 border-l-[var(--status-warning)]">
+            <div className="flex items-center justify-between">
+              <div className="stat-box-label">가장 개선된 학생</div>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--status-warning-bg)' }}>
+                <Award size={16} style={{ color: 'var(--status-warning)' }} strokeWidth={1.8} />
+              </div>
+            </div>
             <div className="stat-box-value">{bestImproved?.name || '-'}</div>
             {bestImproved && <div className="stat-box-change positive">{bestImproved.before} → {bestImproved.after} (-{bestImproved.before - bestImproved.after})</div>}
           </div>

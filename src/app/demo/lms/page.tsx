@@ -9,16 +9,16 @@ export const metadata: Metadata = {
 
 export default function LmsDemoPage() {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-[var(--bg-warm)]">
       {/* Mock LMS Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="bg-white border-b border-[var(--border)] px-6 py-3">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded bg-indigo-600 flex items-center justify-center text-white text-sm font-bold">L</div>
-            <span className="text-lg font-bold text-gray-800">EduLMS</span>
-            <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Demo</span>
+            <span className="text-lg font-bold text-[var(--text-primary)]">EduLMS</span>
+            <span className="text-xs bg-[var(--bg-warm)] text-[var(--text-muted)] px-2 py-1 rounded">Demo</span>
           </div>
-          <div className="flex items-center gap-4 text-sm text-gray-600">
+          <div className="flex items-center gap-4 text-sm text-[var(--text-secondary)]">
             <span>대시보드</span>
             <span>과정 관리</span>
             <span>학생 관리</span>
@@ -27,7 +27,7 @@ export default function LmsDemoPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
         {/* 안내 배너 */}
         <div className="bg-[var(--accent-light)] border border-[var(--accent)]/20 rounded-xl p-5 mb-8">
           <div className="flex items-start gap-3">
@@ -49,33 +49,33 @@ export default function LmsDemoPage() {
           {/* LMS 메인 콘텐츠 */}
           <div className="lg:col-span-2 space-y-6">
             {/* Mock 과정 카드 */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">📋 과정: 데이터분석 기초</h3>
+            <div className="bg-white rounded-xl border border-[var(--border)] p-6">
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">📋 과정: 데이터분석 기초</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-2xl font-bold text-gray-800">12</p>
-                  <p className="text-xs text-gray-500">전체 차시</p>
+                <div className="bg-[var(--bg-warm)] rounded-lg p-4">
+                  <p className="text-2xl font-bold text-[var(--text-primary)]">12</p>
+                  <p className="text-xs text-[var(--text-muted)]">전체 차시</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-2xl font-bold text-gray-800">8</p>
-                  <p className="text-xs text-gray-500">수강생</p>
+                <div className="bg-[var(--bg-warm)] rounded-lg p-4">
+                  <p className="text-2xl font-bold text-[var(--text-primary)]">8</p>
+                  <p className="text-xs text-[var(--text-muted)]">수강생</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-2xl font-bold text-gray-800">67%</p>
-                  <p className="text-xs text-gray-500">평균 진도</p>
+                <div className="bg-[var(--bg-warm)] rounded-lg p-4">
+                  <p className="text-2xl font-bold text-[var(--text-primary)]">67%</p>
+                  <p className="text-xs text-[var(--text-muted)]">평균 진도</p>
                 </div>
               </div>
             </div>
 
             {/* CatchUp AI 학생 카드 위젯 (데모용 — 실제 iframe) */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-white rounded-xl border border-[var(--border)] p-6">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xs bg-[var(--accent-light)] text-[var(--accent)] px-2 py-1 rounded-full font-semibold">
                   CatchUp AI Widget
                 </span>
-                <h3 className="text-lg font-bold text-gray-800">위험 학생 상세</h3>
+                <h3 className="text-lg font-bold text-[var(--text-primary)]">위험 학생 상세</h3>
               </div>
-              <p className="text-sm text-gray-500 mb-4">가장 위험도가 높은 학생의 실시간 상태입니다.</p>
+              <p className="text-sm text-[var(--text-muted)] mb-4">가장 위험도가 높은 학생의 실시간 상태입니다.</p>
               <iframe
                 src="/widget/student-card?api_key=demo"
                 width="100%"
@@ -88,7 +88,7 @@ export default function LmsDemoPage() {
           {/* LMS 사이드바 — CatchUp 위젯 */}
           <div className="space-y-6">
             {/* CatchUp AI 위험 요약 위젯 */}
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-xl border border-[var(--border)] overflow-hidden">
               <div className="bg-[var(--accent)] px-4 py-2 flex items-center gap-2">
                 <span className="text-white text-sm font-semibold">🎯 CatchUp AI</span>
                 <span className="text-white/70 text-xs">위험도 모니터링</span>
@@ -102,26 +102,26 @@ export default function LmsDemoPage() {
             </div>
 
             {/* Mock LMS 기존 사이드 카드들 */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h4 className="text-sm font-bold text-gray-800 mb-3">📅 이번 주 일정</h4>
-              <div className="space-y-2 text-sm text-gray-600">
+            <div className="bg-white rounded-xl border border-[var(--border)] p-5">
+              <h4 className="text-sm font-bold text-[var(--text-primary)] mb-3">📅 이번 주 일정</h4>
+              <div className="space-y-2 text-sm text-[var(--text-secondary)]">
                 <p>• 월 10:00 — 3차시 강의</p>
                 <p>• 수 14:00 — 과제 마감</p>
                 <p>• 금 10:00 — 중간 퀴즈</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h4 className="text-sm font-bold text-gray-800 mb-3">💬 최근 공지</h4>
-              <p className="text-sm text-gray-600">3차시 강의자료가 업로드되었습니다.</p>
+            <div className="bg-white rounded-xl border border-[var(--border)] p-5">
+              <h4 className="text-sm font-bold text-[var(--text-primary)] mb-3">💬 최근 공지</h4>
+              <p className="text-sm text-[var(--text-secondary)]">3차시 강의자료가 업로드되었습니다.</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12 px-6 py-4">
-        <p className="text-center text-xs text-gray-400">
+      <footer className="bg-white border-t border-[var(--border)] mt-12 px-6 py-4">
+        <p className="text-center text-xs text-[var(--text-muted)]">
           이 페이지는 CatchUp AI의 LMS 통합을 시연하기 위한 가상 데모입니다. |
           <a href="/integration" className="text-[var(--accent)] ml-1 hover:underline">통합 가이드</a> |
           <a href="/docs" className="text-[var(--accent)] ml-1 hover:underline">API 문서</a>

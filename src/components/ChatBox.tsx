@@ -124,26 +124,36 @@ export function ChatBox({ studentId }: { studentId: string }) {
         )}
 
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} group`}>
             {msg.role === 'assistant' && (
-              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-sm mr-2 mt-1">
-                🎓
+              <div className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center mr-2 mt-1" style={{ background: 'var(--gradient-accent)' }}>
+                <span className="text-white text-[10px] font-bold">AI</span>
               </div>
             )}
-            <div className={msg.role === 'user' ? 'msg-bubble msg-bubble-user' : 'msg-bubble msg-bubble-assistant'}>
-              {msg.role === 'assistant' ? (
-                msg.content ? (
-                  <div className="chat-md">
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
-                  </div>
+            {msg.role === 'user' && (
+              <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-[var(--bg-warm)] flex items-center justify-center ml-2 mt-1 order-1 text-[10px] text-[var(--text-secondary)]" style={{ fontWeight: 510 }}>
+                나
+              </div>
+            )}
+            <div className="flex flex-col">
+              <div className={msg.role === 'user' ? 'msg-bubble msg-bubble-user' : 'msg-bubble msg-bubble-assistant'}>
+                {msg.role === 'assistant' ? (
+                  msg.content ? (
+                    <div className="chat-md">
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <div className="typing-indicator">
+                      <span /><span /><span />
+                    </div>
+                  )
                 ) : (
-                  <div className="typing-indicator">
-                    <span /><span /><span />
-                  </div>
-                )
-              ) : (
-                msg.content
-              )}
+                  msg.content
+                )}
+              </div>
+              <span className="text-[10px] text-[var(--text-muted)] mt-1 opacity-0 group-hover:opacity-100 transition-opacity px-1">
+                {new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+              </span>
             </div>
           </div>
         ))}

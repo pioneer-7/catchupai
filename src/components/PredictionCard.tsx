@@ -1,6 +1,7 @@
 // AI 이탈 예측 결과 카드
 // SSOT: specs/005-ai/prediction-spec.md 섹션 5
 
+import { TrendingUp, ArrowRight, TrendingDown, AlertTriangle } from 'lucide-react';
 import type { RiskPrediction } from '@/types';
 
 const LEVEL_CONFIG = {
@@ -10,11 +11,11 @@ const LEVEL_CONFIG = {
   low: { label: '안정', color: 'var(--status-stable)', bg: 'var(--status-stable-bg)' },
 };
 
-const TRAJECTORY_LABELS = {
-  improving: '📈 개선 중',
-  stable: '➡️ 유지',
-  declining: '📉 악화 중',
-  critical_decline: '⚠️ 급격 악화',
+const TRAJECTORY_CONFIG = {
+  improving: { label: '개선 중', icon: TrendingUp, color: 'var(--status-stable)' },
+  stable: { label: '유지', icon: ArrowRight, color: 'var(--text-secondary)' },
+  declining: { label: '악화 중', icon: TrendingDown, color: 'var(--status-warning)' },
+  critical_decline: { label: '급격 악화', icon: AlertTriangle, color: 'var(--status-risk)' },
 };
 
 export function PredictionCard({ prediction }: { prediction: RiskPrediction }) {
@@ -32,10 +33,17 @@ export function PredictionCard({ prediction }: { prediction: RiskPrediction }) {
         <span className="inline-block mt-3 px-4 py-1.5 rounded-full text-sm font-semibold" style={{ backgroundColor: level.bg, color: level.color }}>
           {level.label}
         </span>
-        <p className="mt-3 text-sm text-[var(--text-secondary)]">
-          {TRAJECTORY_LABELS[p.trajectory]}
-          {p.weeks_to_likely_dropout && ` · 예상 이탈까지 ${p.weeks_to_likely_dropout}주`}
-        </p>
+        <div className="mt-3 flex items-center justify-center gap-2 text-sm">
+          {(() => {
+            const t = TRAJECTORY_CONFIG[p.trajectory];
+            return (
+              <span className="flex items-center gap-1" style={{ color: t.color, fontWeight: 510 }}>
+                <t.icon size={14} strokeWidth={2} /> {t.label}
+              </span>
+            );
+          })()}
+          {p.weeks_to_likely_dropout && <span className="text-[var(--text-muted)]">· 예상 이탈까지 {p.weeks_to_likely_dropout}주</span>}
+        </div>
       </div>
 
       {/* Risk Factors */}
