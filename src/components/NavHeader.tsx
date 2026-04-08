@@ -1,17 +1,18 @@
 'use client';
 
-// 네비게이션 헤더 — 메인 메뉴 + 개발자 서브메뉴 + 모바일 햄버거
-// 랜딩 페이지(/)에서는 숨김
+// 네비게이션 — Notion+Linear 하이브리드
+// SSOT: specs/003-frontend/student-detail-spec.md
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
+import { GraduationCap, LayoutDashboard, Users, BarChart3, Upload, Code2, ChevronDown, Menu, X, RefreshCw } from 'lucide-react';
 
 const MAIN_LINKS = [
-  { href: '/dashboard', label: '대시보드' },
-  { href: '/students', label: '학생 목록' },
-  { href: '/analytics', label: '분석' },
-  { href: '/upload', label: '업로드' },
+  { href: '/dashboard', label: '대시보드', icon: LayoutDashboard },
+  { href: '/students', label: '학생 목록', icon: Users },
+  { href: '/analytics', label: '분석', icon: BarChart3 },
+  { href: '/upload', label: '업로드', icon: Upload },
 ];
 
 const DEV_LINKS = [
@@ -28,7 +29,6 @@ export function NavHeader() {
   const [devOpen, setDevOpen] = useState(false);
   const devRef = useRef<HTMLDivElement>(null);
 
-  // 서브메뉴 외부 클릭 닫기 — Hooks는 반드시 조건문 전에 호출
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (devRef.current && !devRef.current.contains(e.target as Node)) setDevOpen(false);
@@ -51,68 +51,86 @@ export function NavHeader() {
   const isDevPage = ['/docs', '/integration', '/demo'].some(p => pathname.startsWith(p));
 
   return (
-    <header className="border-b border-[var(--border)] bg-white sticky top-0 z-40">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-        <Link href="/" className="text-lg font-bold tracking-tight">
-          CatchUp AI
+    <header className="border-b border-[var(--border)] bg-white/80 backdrop-blur-sm sticky top-0 z-40">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 h-14">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="w-7 h-7 rounded-lg bg-[var(--gradient-accent)] flex items-center justify-center">
+            <GraduationCap size={16} className="text-white" />
+          </div>
+          <span className="text-[15px] font-bold tracking-tight group-hover:text-[var(--accent)] transition" style={{ fontWeight: 'var(--font-weight-emphasis)' as unknown as number }}>
+            CatchUp AI
+          </span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-5">
-          {MAIN_LINKS.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`text-[15px] font-semibold transition-colors focus-ring rounded ${
-                pathname.startsWith(href) ? 'text-[var(--accent)]' : 'hover:text-[var(--accent)]'
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
+        <div className="hidden md:flex items-center gap-1">
+          {MAIN_LINKS.map(({ href, label, icon: Icon }) => {
+            const active = pathname.startsWith(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-[13px] rounded-[var(--radius-button)] transition-all ${
+                  active
+                    ? 'text-[var(--accent)] bg-[var(--accent-light)]'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-warm)]'
+                }`}
+                style={{ fontWeight: 510 }}
+              >
+                <Icon size={14} strokeWidth={active ? 2.2 : 1.8} />
+                {label}
+              </Link>
+            );
+          })}
 
-          {/* 개발자 서브메뉴 드롭다운 */}
+          {/* 개발자 드롭다운 */}
           <div ref={devRef} className="relative">
             <button
               onClick={() => setDevOpen(!devOpen)}
-              className={`text-[15px] font-semibold transition-colors focus-ring rounded flex items-center gap-1 ${
-                isDevPage ? 'text-[var(--accent)]' : 'hover:text-[var(--accent)]'
+              className={`flex items-center gap-1 px-3 py-1.5 text-[13px] rounded-[var(--radius-button)] transition-all ${
+                isDevPage
+                  ? 'text-[var(--accent)] bg-[var(--accent-light)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-warm)]'
               }`}
+              style={{ fontWeight: 510 }}
             >
+              <Code2 size={14} strokeWidth={1.8} />
               개발자
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
-                className={`transition-transform ${devOpen ? 'rotate-180' : ''}`}>
-                <polyline points="3 5 6 8 9 5" />
-              </svg>
+              <ChevronDown size={12} className={`transition-transform ${devOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {devOpen && (
-              <div className="absolute right-0 top-full mt-2 w-64 card card-deep p-2 bg-white">
+              <div className="absolute right-0 top-full mt-1.5 w-60 card card-deep p-1.5 bg-white border border-[var(--border)]">
                 {DEV_LINKS.map(({ href, label, desc }) => (
                   <Link
                     key={href}
                     href={href}
                     onClick={() => setDevOpen(false)}
-                    className={`block px-3 py-2.5 rounded-[var(--radius-button)] transition-colors ${
+                    className={`block px-3 py-2.5 rounded-[var(--radius-button)] transition-all ${
                       pathname.startsWith(href)
                         ? 'bg-[var(--accent-light)] text-[var(--accent)]'
                         : 'hover:bg-[var(--bg-warm)]'
                     }`}
                   >
-                    <p className="text-sm font-semibold">{label}</p>
-                    <p className="text-xs text-[var(--text-muted)] mt-0.5">{desc}</p>
+                    <p className="text-[13px]" style={{ fontWeight: 510 }}>{label}</p>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">{desc}</p>
                   </Link>
                 ))}
               </div>
             )}
           </div>
 
+          <div className="w-px h-5 bg-[var(--border)] mx-1.5" />
+
           <button
             onClick={handleReset}
             disabled={resetting}
-            className="text-xs px-3 py-1.5 rounded-[var(--radius-button)] bg-[var(--bg-warm)] text-[var(--text-secondary)] font-medium hover:bg-[var(--bg-warm-hover)] transition btn-press focus-ring disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] rounded-[var(--radius-button)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-warm)] transition-all disabled:opacity-50"
+            style={{ fontWeight: 510 }}
           >
-            {resetting ? '리셋 중...' : '데모 리셋'}
+            <RefreshCw size={12} className={resetting ? 'animate-spin' : ''} />
+            {resetting ? '리셋 중' : '데모 리셋'}
           </button>
         </div>
 
@@ -122,42 +140,45 @@ export function NavHeader() {
           className="md:hidden p-2 rounded-[var(--radius-button)] hover:bg-[var(--bg-warm)] transition focus-ring"
           aria-label="메뉴 열기"
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-            {mobileOpen ? (
-              <><line x1="4" y1="4" x2="16" y2="16" /><line x1="16" y1="4" x2="4" y2="16" /></>
-            ) : (
-              <><line x1="3" y1="5" x2="17" y2="5" /><line x1="3" y1="10" x2="17" y2="10" /><line x1="3" y1="15" x2="17" y2="15" /></>
-            )}
-          </svg>
+          {mobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
       </nav>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[var(--border)] bg-white px-6 py-4 space-y-1">
-          {MAIN_LINKS.map(({ href, label }) => (
+        <div className="md:hidden border-t border-[var(--border)] bg-white px-6 py-3 space-y-0.5" style={{ animation: 'slideDown 200ms ease-out' }}>
+          {MAIN_LINKS.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} onClick={() => setMobileOpen(false)}
-              className={`block text-[15px] font-semibold py-2.5 transition-colors ${pathname.startsWith(href) ? 'text-[var(--accent)]' : 'hover:text-[var(--accent)]'}`}>
-              {label}
+              className={`flex items-center gap-2 px-3 py-2.5 text-[14px] rounded-[var(--radius-button)] transition-all ${
+                pathname.startsWith(href) ? 'text-[var(--accent)] bg-[var(--accent-light)]' : 'hover:bg-[var(--bg-warm)]'
+              }`} style={{ fontWeight: 510 }}>
+              <Icon size={16} strokeWidth={1.8} />{label}
             </Link>
           ))}
-
           <div className="border-t border-[var(--border)] pt-2 mt-2">
-            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">개발자</p>
+            <p className="px-3 py-1 text-[11px] text-[var(--text-muted)] uppercase tracking-wider" style={{ fontWeight: 510 }}>개발자</p>
             {DEV_LINKS.map(({ href, label }) => (
               <Link key={href} href={href} onClick={() => setMobileOpen(false)}
-                className={`block text-sm font-medium py-2 pl-2 transition-colors ${pathname.startsWith(href) ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)] hover:text-[var(--accent)]'}`}>
-                {label}
-              </Link>
+                className={`block px-3 py-2 text-[13px] rounded-[var(--radius-button)] ${
+                  pathname.startsWith(href) ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)] hover:text-[var(--accent)]'
+                }`} style={{ fontWeight: 510 }}>{label}</Link>
             ))}
           </div>
-
           <button onClick={handleReset} disabled={resetting}
-            className="w-full text-sm py-2.5 mt-2 rounded-[var(--radius-button)] bg-[var(--bg-warm)] text-[var(--text-secondary)] font-medium hover:bg-[var(--bg-warm-hover)] transition btn-press disabled:opacity-50">
+            className="w-full flex items-center justify-center gap-1.5 py-2.5 mt-2 text-[13px] rounded-[var(--radius-button)] bg-[var(--bg-warm)] text-[var(--text-secondary)] hover:bg-[var(--bg-warm-hover)] transition disabled:opacity-50"
+            style={{ fontWeight: 510 }}>
+            <RefreshCw size={13} className={resetting ? 'animate-spin' : ''} />
             {resetting ? '리셋 중...' : '데모 리셋'}
           </button>
         </div>
       )}
+
+      <style jsx>{`
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </header>
   );
 }
