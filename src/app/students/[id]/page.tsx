@@ -15,6 +15,7 @@ import { ActivityTimeline } from '@/components/ActivityTimeline';
 import { ChatBox } from '@/components/ChatBox';
 import { PredictionCard } from '@/components/PredictionCard';
 import { exportRecoveryPlanPDF } from '@/lib/pdf-export';
+import { BookOpen, MessageSquare, ClipboardCheck, Sparkles, GraduationCap, History, ArrowLeft } from 'lucide-react';
 import type { RiskPrediction } from '@/types';
 import type {
   StudentDetailData, RecoveryPlan, InterventionMessage,
@@ -24,12 +25,12 @@ import type {
 type GenState = 'idle' | 'loading' | 'done' | 'error';
 
 const TABS = [
-  { id: 'recovery', label: '회복학습', icon: '📚' },
-  { id: 'message', label: '메시지', icon: '💬' },
-  { id: 'assessment', label: '미니 진단', icon: '✏️' },
-  { id: 'prediction', label: '이탈 예측', icon: '🔮' },
-  { id: 'coaching', label: 'AI 어시스턴트', icon: '🎓' },
-  { id: 'timeline', label: '활동 기록', icon: '📋' },
+  { id: 'recovery', label: '회복학습', icon: <BookOpen size={14} strokeWidth={1.8} /> },
+  { id: 'message', label: '메시지', icon: <MessageSquare size={14} strokeWidth={1.8} /> },
+  { id: 'assessment', label: '미니 진단', icon: <ClipboardCheck size={14} strokeWidth={1.8} /> },
+  { id: 'prediction', label: '이탈 예측', icon: <Sparkles size={14} strokeWidth={1.8} /> },
+  { id: 'coaching', label: 'AI 어시스턴트', icon: <GraduationCap size={14} strokeWidth={1.8} /> },
+  { id: 'timeline', label: '활동 기록', icon: <History size={14} strokeWidth={1.8} /> },
 ];
 
 export default function StudentDetailPage() {
@@ -158,8 +159,8 @@ export default function StudentDetailPage() {
     <main className="flex-1 px-6 py-12 max-w-4xl mx-auto w-full">
       <ToastContainer items={toastItems} onDismiss={dismissToast} />
 
-      <Link href="/students" className="text-sm text-[var(--accent)] font-semibold hover:underline">
-        &larr; 학생 목록
+      <Link href="/students" className="inline-flex items-center gap-1 text-[13px] text-[var(--accent)] hover:gap-2 transition-all" style={{ fontWeight: 510 }}>
+        <ArrowLeft size={14} /> 학생 목록
       </Link>
 
       {/* ═══ Zone A: 학생 정보 (항상 노출) ═══ */}
@@ -171,7 +172,7 @@ export default function StudentDetailPage() {
           </div>
           <div className="text-right">
             <RiskBadge level={p.risk_level} />
-            <p className="mt-2 text-3xl font-bold tracking-tight num-display">{p.risk_score}</p>
+            <p className="mt-2 text-4xl tracking-tight num-display" style={{ fontWeight: 'var(--font-weight-emphasis)' as unknown as number }}>{p.risk_score}</p>
             <p className="text-xs text-[var(--text-muted)]">위험 점수</p>
           </div>
         </div>
