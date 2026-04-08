@@ -10,6 +10,7 @@ import { useState, useRef, useEffect } from 'react';
 const MAIN_LINKS = [
   { href: '/dashboard', label: '대시보드' },
   { href: '/students', label: '학생 목록' },
+  { href: '/analytics', label: '분석' },
   { href: '/upload', label: '업로드' },
 ];
 
