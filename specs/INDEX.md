@@ -28,7 +28,8 @@ specs/
 │   ├── student-detail-spec.md            — /students/[id] 상세, 액션 버튼, AI 결��
 │   ├── recovery-plan-spec.md             — 회복학습 결과 카드 레이아웃
 │   ├── widget-spec.md                    — 임베더블 위젯 (iframe), 통합 가이드, Mock LMS
-│   └── analytics-spec.md                — 이탈 퍼널, 코호트 분포, 개입 효과 시각화 ★P2
+│   ├── analytics-spec.md                — 이탈 퍼널, 코호트 분포, 개입 효과 시각화 ★P2
+│   └── onboarding-spec.md              — 3단계 온보딩, 프로그레스, 첫 로그인 ★SaaS
 ├── 004-backend/
 │   ├── architecture-spec.md              — 3-Layer Clean Architecture, Repository/Service ★NEW
 │   ├── validation-spec.md                — Zod 스키마 4개, 검증 위치, 에러 형식 ★NEW
@@ -37,6 +38,12 @@ specs/
 │   ├── api-auth-spec.md                  — API 키 인증, 면제 조건, 향후 확장 ★NEW
 │   ├── openapi-spec.md                   — OpenAPI 3.0, Swagger UI, 스키마 매핑 ★NEW
 │   ├── webhook-spec.md                   — 이벤트 4개, 구독 API, HMAC, 재시도 ★NEW
+│   ├── auth-spec.md                      — Supabase Auth, AuthModal, 보호 라우트 ★SaaS
+│   ├── billing-spec.md                   — Free/Pro/API 요금제, 포트원, Feature Gate ★SaaS
+│   ├── multi-tenant-spec.md              — 조직, org_id, RLS 정책 ★SaaS
+│   ├── notification-spec.md              — 인앱 알림, 이벤트 트리거, NotificationBell ★SaaS
+│   ├── rate-limit-spec.md                — 티어별 한도, 사용량 추적, 429 ★SaaS
+│   ├── testing-spec.md                   — Vitest, CI/CD, 커버리지 80% ★SaaS
 │   ├── upload-parser-spec.md             — CSV/PDF 업로드, 파싱, 저장, 샘플 데이터
 │   └── persistence-spec.md               — Supabase 설정, 접근 패턴, 마이그레이션
 ├── 005-ai/
@@ -51,7 +58,7 @@ specs/
     └── edge-cases.md                     — 입력 검증, AI 실패, 경계값, UI 예외
 ```
 
-**총 32개 spec 파일** (기존 22개 + Phase 1 신규 7개 + Phase 2 신규 3개)
+**총 39개 spec 파일** (기존 22개 + 플랫폼 7개 + AI 3개 + SaaS 7개)
 
 ---
 
