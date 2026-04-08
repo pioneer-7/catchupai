@@ -27,7 +27,8 @@ specs/
 │   ├── student-list-spec.md              — /students 테이블, 검색, 필터, 정렬
 │   ├── student-detail-spec.md            — /students/[id] 상세, 액션 버튼, AI 결��
 │   ├── recovery-plan-spec.md             — 회복학습 결과 카드 레이아웃
-│   └── widget-spec.md                    — 임베더블 위젯 (iframe), 통합 가이드, Mock LMS ★NEW
+│   ├── widget-spec.md                    — 임베더블 위젯 (iframe), 통합 가이드, Mock LMS
+│   └── analytics-spec.md                — 이탈 퍼널, 코호트 분포, 개입 효과 시각화 ★P2
 ├── 004-backend/
 │   ├── architecture-spec.md              — 3-Layer Clean Architecture, Repository/Service ★NEW
 │   ├── validation-spec.md                — Zod 스키마 4개, 검증 위치, 에러 형식 ★NEW
@@ -39,16 +40,18 @@ specs/
 │   ├── upload-parser-spec.md             — CSV/PDF 업로드, 파싱, 저장, 샘플 데이터
 │   └── persistence-spec.md               — Supabase 설정, 접근 패턴, 마이그레이션
 ├── 005-ai/
-│   ├── prompts.md                        — 시스템 프롬프트, 4개 user prompt ���플릿
+│   ├── prompts.md                        — 시스템 프롬프트, 4개 user prompt 템플릿
 │   ├── output-schema.md                  — JSON Schema 정의 (검증용)
-│   └── guardrails.md                     — 금지 사항, 톤 규칙, fallback 정책
+│   ├── guardrails.md                     — 금지 사항, 톤 규칙, fallback 정책
+│   ├── chat-spec.md                      — AI 학습 코칭 챗봇, 스트리밍, 세션 ★P2
+│   └── prediction-spec.md               — AI 이탈 위험 예측, 구조화 출력, 궤적 ★P2
 ��── 006-qa/
     ├── acceptance-criteria.md            — 기능별/비기능/데모 수용 기준 체크리스트
     ├── demo-scenario.md                  — 3분 데모 흐름, 체크리스트, 실패 대응
     └── edge-cases.md                     — 입력 검증, AI 실패, 경계값, UI 예외
 ```
 
-**총 29개 spec 파일** (기존 22개 + 신규 7개)
+**총 32개 spec 파일** (기존 22개 + Phase 1 신규 7개 + Phase 2 신규 3개)
 
 ---
 
