@@ -6,8 +6,9 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
-import { GraduationCap, LayoutDashboard, Users, BarChart3, Upload, Code2, ChevronDown, Menu, X, RefreshCw, LogOut, Settings } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Users, BarChart3, Upload, Code2, ChevronDown, Menu, X, RefreshCw, LogOut } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
+import { NotificationBell } from '@/components/NotificationBell';
 
 const MAIN_LINKS = [
   { href: '/dashboard', label: '대시보드', icon: LayoutDashboard },
@@ -140,7 +141,8 @@ export function NavHeader() {
 
           <div className="w-px h-5 bg-[var(--border)] mx-1.5" />
 
-          {/* Auth buttons */}
+          {/* Notifications + Auth */}
+          <NotificationBell />
           {user ? (
             <div ref={userRef} className="relative">
               <button
