@@ -11,6 +11,7 @@ import { MetricCard } from '@/components/MetricCard';
 import { RiskFactorTag } from '@/components/RiskFactorTag';
 import { ToastContainer, useToast } from '@/components/Toast';
 import { ActivityTimeline } from '@/components/ActivityTimeline';
+import { ChatBox } from '@/components/ChatBox';
 import { exportRecoveryPlanPDF } from '@/lib/pdf-export';
 import type {
   StudentDetailData, RecoveryPlan, InterventionMessage,
@@ -443,6 +444,12 @@ export default function StudentDetailPage() {
           })}
         </section>
       )}
+
+      {/* ─── AI Coaching Chat ─── */}
+      <section>
+        <h2 className="text-lg heading-md mb-4">AI 학습 코치</h2>
+        <ChatBox studentId={id} />
+      </section>
 
       {/* ─── Activity Timeline ─── */}
       <ActivityTimeline

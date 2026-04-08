@@ -114,6 +114,74 @@ async function callClaude(userPrompt: string): Promise<string | null> {
   }
 }
 
+// ─── Chat (Streaming) ───
+// SSOT: specs/005-ai/chat-spec.md
+
+export function buildChatSystemPrompt(
+  studentName: string,
+  riskLevel: string,
+  riskScore: number,
+  riskFactors: string,
+  recoveryPlanSummary: string,
+  courseTitle: string,
+  courseMaterial: string
+): string {
+  return `You are a personalized learning coach for ${studentName}.
+
+STUDENT PROFILE:
+- Risk level: ${riskLevel} (score: ${riskScore}/100)
+- Primary risk factors: ${riskFactors}
+- Recovery plan: ${recoveryPlanSummary}
+- Course: ${courseTitle}
+- Course material excerpt: ${courseMaterial.slice(0, 1500)}
+
+YOUR ROLE:
+- Help this specific student follow their recovery plan
+- Ask clarifying questions before giving guidance (Socratic method)
+- Acknowledge difficulty ("어려울 수 있어요, 같이 풀어봐요")
+- Track which recovery steps the student mentions completing
+- Respond in Korean
+
+GUARDRAILS:
+- Do NOT provide direct homework answers — redirect: "같이 단계별로 생각해볼까요?"
+- Do NOT discuss topics outside this course — say: "저는 이 과목 복습을 도와드리는 코치예요"
+- Do NOT speculate about personal circumstances
+- Always end with ONE specific action item for today
+- Keep responses under 200 words`;
+}
+
+export async function* streamChatResponse(
+  systemPrompt: string,
+  messages: { role: 'user' | 'assistant'; content: string }[]
+): AsyncGenerator<string> {
+  const client = getClient();
+  if (!client) {
+    yield '지금 잠시 연결이 원활하지 않아요. 잠시 후 다시 시도해주세요. 그동안 회복학습 플랜의 1단계를 먼저 읽어보면 좋아요!';
+    return;
+  }
+
+  try {
+    const stream = client.messages.stream({
+      model: MODEL,
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: messages.map(m => ({ role: m.role, content: m.content })),
+    });
+
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta') {
+        const delta = event.delta;
+        if ('text' in delta) {
+          yield delta.text;
+        }
+      }
+    }
+  } catch (error) {
+    console.error('[AI] Chat stream failed:', error);
+    yield '죄송해요, 응답 중 문제가 발생했어요. 다시 질문해주세요!';
+  }
+}
+
 // ─── JSON parsing ───
 
 function extractJson(raw: string): unknown | null {
