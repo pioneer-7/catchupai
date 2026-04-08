@@ -27,9 +27,7 @@ export function NavHeader() {
   const [devOpen, setDevOpen] = useState(false);
   const devRef = useRef<HTMLDivElement>(null);
 
-  if (pathname === '/') return null;
-
-  // 서브메뉴 외부 클릭 닫기
+  // 서브메뉴 외부 클릭 닫기 — Hooks는 반드시 조건문 전에 호출
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (devRef.current && !devRef.current.contains(e.target as Node)) setDevOpen(false);
@@ -37,6 +35,8 @@ export function NavHeader() {
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
+
+  if (pathname === '/') return null;
 
   async function handleReset() {
     setResetting(true);
