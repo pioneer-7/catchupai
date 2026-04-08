@@ -1,10 +1,13 @@
 // Assessment Service — 미니 진단 생성 + 제출 비즈니스 로직
+// SSOT: specs/004-backend/architecture-spec.md, webhook-spec.md 섹션 6
 import { studentService } from '@/services/student.service';
 import { courseRepository } from '@/repositories/course.repository';
 import { assessmentRepository } from '@/repositories/assessment.repository';
 import { progressRepository } from '@/repositories/progress.repository';
 import { buildAiContext, generateMiniAssessment } from '@/lib/ai';
 import { calculateScoreDelta, recalculateLevel } from '@/lib/risk-scoring';
+import { createEvent } from '@/lib/events';
+import { dispatchEvent } from '@/lib/webhook-dispatcher';
 import type { MiniAssessment, AssessmentSubmitData, SubmittedAnswer } from '@/types';
 
 export const assessmentService = {
@@ -72,6 +75,17 @@ export const assessmentService = {
       risk_score: riskScoreAfter,
       risk_level: riskLevelAfter,
     });
+
+    // 이벤트 발행 (비동기, 실패해도 결과에 영향 없음)
+    dispatchEvent(createEvent('assessment.submitted', {
+      student_id: studentId, assessment_id: assessmentId, score: correctCount, total: 3,
+    })).catch(() => {});
+
+    if (riskLevelBefore !== riskLevelAfter) {
+      dispatchEvent(createEvent('student.risk_level_changed', {
+        student_id: studentId, old_level: riskLevelBefore, new_level: riskLevelAfter, risk_score: riskScoreAfter,
+      })).catch(() => {});
+    }
 
     return {
       score: correctCount,

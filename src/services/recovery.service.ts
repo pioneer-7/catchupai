@@ -1,8 +1,11 @@
 // Recovery Service — 회복학습 생성 비즈니스 로직
+// SSOT: specs/004-backend/architecture-spec.md, webhook-spec.md 섹션 6
 import { studentService } from '@/services/student.service';
 import { courseRepository } from '@/repositories/course.repository';
 import { recoveryPlanRepository } from '@/repositories/recovery-plan.repository';
 import { buildAiContext, generateRecoveryPlan } from '@/lib/ai';
+import { createEvent } from '@/lib/events';
+import { dispatchEvent } from '@/lib/webhook-dispatcher';
 import type { RecoveryPlan } from '@/types';
 
 export const recoveryService = {
@@ -26,6 +29,11 @@ export const recoveryService = {
     };
 
     await recoveryPlanRepository.save(plan);
+
+    dispatchEvent(createEvent('recovery_plan.created', {
+      student_id: studentId, plan_id: plan.id, missed_concepts_summary: plan.missed_concepts_summary,
+    })).catch(() => {});
+
     return plan;
   },
 };
