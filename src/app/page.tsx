@@ -11,14 +11,19 @@ const FEATURES = [
     icon: '🔍',
   },
   {
-    title: 'AI 맞춤 회복학습',
-    description: '강의자료와 학생 상태를 기반으로 3단계 복습 플랜과 액션 플랜을 AI가 자동 생성합니다.',
-    icon: '📚',
+    title: 'AI 이탈 예측',
+    description: 'Claude AI가 학생 데이터를 종합 분석해 이탈 확률, 위험 궤적, 개입 효과를 예측합니다.',
+    icon: '🔮',
   },
   {
-    title: '개입 메시지 & 미니 진단',
-    description: '격려형 메시지 초안 생성, 3문항 이해도 진단, 채점 후 위험도 자동 재계산까지.',
-    icon: '💬',
+    title: 'AI 교육 어시스턴트',
+    description: '교강사를 위한 실시간 AI 상담. 개입 전략, 교수법 조언을 스트리밍으로 제공합니다.',
+    icon: '🎓',
+  },
+  {
+    title: '교육 분석 대시보드',
+    description: '이탈 퍼널, 코호트 분포, 개입 효과를 시각적으로 확인하고 데이터 기반 의사결정.',
+    icon: '📊',
   },
 ];
 
@@ -54,7 +59,7 @@ export default function LandingPage() {
           <h2 className="text-3xl md:text-4xl heading-lg text-center mb-16">
             학습 이탈, 더 빠르게 발견하고 더 정밀하게 대응
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {FEATURES.map((f) => (
               <div
                 key={f.title}
