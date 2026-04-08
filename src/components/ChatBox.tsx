@@ -87,8 +87,8 @@ export function ChatBox({ studentId }: { studentId: string }) {
         <div className="flex items-center gap-2">
           <span className="text-lg">🎓</span>
           <div>
-            <h3 className="text-sm font-bold">AI 학습 코치</h3>
-            <p className="text-xs text-[var(--text-muted)]">회복학습 플랜 기반 1:1 코칭</p>
+            <h3 className="text-sm font-bold">AI 교육 어시스턴트</h3>
+            <p className="text-xs text-[var(--text-muted)]">학생 개입 전략 · 교수법 조언</p>
           </div>
           {streaming && (
             <span className="ml-auto px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--accent-light)] text-[var(--accent-text)]">
@@ -104,13 +104,13 @@ export function ChatBox({ studentId }: { studentId: string }) {
           <div className="text-center py-10">
             <p className="text-3xl mb-3">👋</p>
             <p className="text-sm font-medium text-[var(--text-secondary)]">
-              안녕하세요! 회복학습을 도와드리는 AI 코치입니다.
+              이 학생에 대한 개입 전략을 도와드리는 AI 어시스턴트입니다.
             </p>
             <p className="text-xs text-[var(--text-muted)] mt-2">
-              궁금한 개념이나 어려운 부분을 물어보세요.
+              학생 상태, 개입 방법, 메시지 작성 등을 물어보세요.
             </p>
             <div className="mt-4 flex flex-wrap gap-2 justify-center">
-              {['이번 주 뭘 공부해야 할까요?', '회귀분석이 뭔가요?', '과제 도와주세요'].map(q => (
+              {['이 학생에게 어떻게 개입하면 좋을까요?', '회복학습 플랜을 쉽게 설명해줘', '학부모 상담 포인트 알려줘'].map(q => (
                 <button
                   key={q}
                   onClick={() => { setInput(q); inputRef.current?.focus(); }}

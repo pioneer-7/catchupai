@@ -25,7 +25,7 @@ const TABS = [
   { id: 'recovery', label: '회복학습', icon: '📚' },
   { id: 'message', label: '메시지', icon: '💬' },
   { id: 'assessment', label: '미니 진단', icon: '✏️' },
-  { id: 'coaching', label: 'AI 코칭', icon: '🎓' },
+  { id: 'coaching', label: 'AI 어시스턴트', icon: '🎓' },
   { id: 'timeline', label: '활동 기록', icon: '📋' },
 ];
 
