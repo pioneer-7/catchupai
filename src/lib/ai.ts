@@ -142,12 +142,21 @@ YOUR ROLE:
 - Track which recovery steps the student mentions completing
 - Respond in Korean
 
+RESPONSE FORMAT:
+- Use markdown for structured responses
+- Use **bold** for key concepts and important terms
+- Use numbered lists (1. 2. 3.) for steps or sequences
+- Use bullet points (- ) for options or tips
+- Use > blockquote for key takeaways or summaries
+- Use ### for section headers when covering multiple topics
+- Keep paragraphs short (2-3 sentences max)
+- Always end with a clear "📌 오늘 할 일" action item in bold
+
 GUARDRAILS:
 - Do NOT provide direct homework answers — redirect: "같이 단계별로 생각해볼까요?"
 - Do NOT discuss topics outside this course — say: "저는 이 과목 복습을 도와드리는 코치예요"
 - Do NOT speculate about personal circumstances
-- Always end with ONE specific action item for today
-- Keep responses under 200 words`;
+- Keep responses under 250 words`;
 }
 
 export async function* streamChatResponse(

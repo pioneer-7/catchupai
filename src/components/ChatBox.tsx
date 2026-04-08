@@ -1,9 +1,10 @@
 'use client';
 
-// AI 코칭 챗봇 UI — 스트리밍 메시지 + 디자인 토큰
+// AI 코칭 챗봇 UI — 스트리밍 + 마크다운 렌더링
 // SSOT: specs/005-ai/chat-spec.md 섹션 6
 
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,7 +19,7 @@ export function ChatBox({ studentId }: { studentId: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, streaming]);
 
   async function handleSend() {
@@ -29,7 +30,6 @@ export function ChatBox({ studentId }: { studentId: string }) {
     setMessages(prev => [...prev, { role: 'user', content: text }]);
     setStreaming(true);
 
-    // 빈 assistant 메시지 추가 (스트리밍 대상)
     setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
     try {
@@ -90,36 +90,63 @@ export function ChatBox({ studentId }: { studentId: string }) {
             <h3 className="text-sm font-bold">AI 학습 코치</h3>
             <p className="text-xs text-[var(--text-muted)]">회복학습 플랜 기반 1:1 코칭</p>
           </div>
+          {streaming && (
+            <span className="ml-auto px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--accent-light)] text-[var(--accent-text)]">
+              응답 중
+            </span>
+          )}
         </div>
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="px-6 py-4 space-y-4 overflow-y-auto" style={{ maxHeight: 400, minHeight: 200 }}>
+      <div ref={scrollRef} className="px-6 py-4 space-y-4 overflow-y-auto" style={{ maxHeight: 480, minHeight: 200 }}>
         {messages.length === 0 && (
-          <div className="text-center py-8">
+          <div className="text-center py-10">
             <p className="text-3xl mb-3">👋</p>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm font-medium text-[var(--text-secondary)]">
               안녕하세요! 회복학습을 도와드리는 AI 코치입니다.
             </p>
-            <p className="text-xs text-[var(--text-muted)] mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-2">
               궁금한 개념이나 어려운 부분을 물어보세요.
             </p>
+            <div className="mt-4 flex flex-wrap gap-2 justify-center">
+              {['이번 주 뭘 공부해야 할까요?', '회귀분석이 뭔가요?', '과제 도와주세요'].map(q => (
+                <button
+                  key={q}
+                  onClick={() => { setInput(q); inputRef.current?.focus(); }}
+                  className="px-3 py-1.5 text-xs font-medium rounded-full bg-[var(--bg-warm)] text-[var(--text-secondary)] hover:bg-[var(--bg-warm-hover)] transition btn-press"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {msg.role === 'assistant' && (
+              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-sm mr-2 mt-1">
+                🎓
+              </div>
+            )}
             <div className={msg.role === 'user' ? 'msg-bubble msg-bubble-user' : 'msg-bubble msg-bubble-assistant'}>
-              {msg.content || (
-                <div className="typing-indicator">
-                  <span /><span /><span />
-                </div>
+              {msg.role === 'assistant' ? (
+                msg.content ? (
+                  <div className="chat-md">
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <div className="typing-indicator">
+                    <span /><span /><span />
+                  </div>
+                )
+              ) : (
+                msg.content
               )}
             </div>
           </div>
         ))}
-
-        {streaming && messages[messages.length - 1]?.content === '' && null}
       </div>
 
       {/* Input */}
