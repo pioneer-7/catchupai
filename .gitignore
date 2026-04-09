@@ -47,3 +47,14 @@ next-env.d.ts
 
 # temp
 .git_temp/
+
+# claude code
+.claude/
+memory/
+
+# supabase temp
+supabase/.temp/
+
+# competition submission docs (personal info)
+*.pdf
+*.docx
