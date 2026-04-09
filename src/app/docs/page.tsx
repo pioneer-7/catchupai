@@ -59,7 +59,7 @@ export default function DocsPage() {
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl heading-md">API Documentation</h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            CatchUp AI REST API v1 — 학습 이탈 방지 AI 코파일럿
+            기존 LMS/ERP에 학습 이탈 탐지를 추가하는 REST API — 학생 위험도 조회, AI 회복학습 생성, 위젯 임베드
           </p>
           <div className="mt-4 flex gap-3">
             <span className="px-3 py-1 text-xs font-semibold rounded-full bg-[var(--accent-light)] text-[var(--accent-text)]">
