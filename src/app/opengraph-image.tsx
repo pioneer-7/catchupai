@@ -79,7 +79,7 @@ export default async function Image() {
           }}
         >
           {[
-            { num: '6', label: 'AI Features' },
+            { num: '5', label: 'AI Features' },
             { num: '14', label: 'Pages' },
             { num: '36', label: 'Tests' },
             { num: '11', label: 'APIs' },

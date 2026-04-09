@@ -5,7 +5,7 @@
 [![Tests](https://img.shields.io/badge/tests-36%20passed-brightgreen)](#테스트)
 [![Pages](https://img.shields.io/badge/pages-14-blue)](#페이지-구성)
 [![API](https://img.shields.io/badge/REST%20API-11%20endpoints-orange)](#플랫폼-통합)
-[![AI](https://img.shields.io/badge/AI%20features-6-purple)](#ai-활용-전략)
+[![AI](https://img.shields.io/badge/AI%20features-5-purple)](#ai-활용-전략)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-yellow)](#cicd)
 
 **Live Demo**: [https://carchupai.vercel.app](https://carchupai.vercel.app)
@@ -63,7 +63,7 @@ CatchUp AI는 **규칙 기반 분석(deterministic)** 과 **AI 생성(generative
 | **미니 진단** | 강의 주제 기반 3문항 + 보기 + 정답 | JSON (questions[]) |
 | **이탈 예측** | 학습 패턴 + 위험 요인 → 확률/궤적/개입효과 | JSON (structured) |
 | **AI 채팅** | 교강사용 시스템 프롬프트 + 학생 컨텍스트 | 스트리밍 마크다운 |
-| **자동 채점** | 문항 + 학생 답변 → 정오답 판정 + 해설 | JSON (results[]) |
+| **채점 + 위험도 재계산** | 정답 키 비교(규칙 기반) → 위험도 점수 보정 | 규칙 기반 |
 
 ### 프롬프트 엔지니어링 핵심
 
@@ -254,7 +254,7 @@ src/
 ├── repositories/ (11)          # 데이터 접근 (Supabase)
 ├── components/ (23)            # UI 컴포넌트 (Notion+Linear 디자인)
 ├── lib/                        # 공유 유틸리티
-│   ├── ai.ts                   # Claude AI 통합 (6 기능 + fallback)
+│   ├── ai.ts                   # Claude AI 통합 (5 기능 + fallback)
 │   ├── risk-scoring.ts         # 위험도 계산 (규칙 기반)
 │   ├── validation.ts           # Zod 스키마
 │   ├── feature-gate.ts         # 요금제별 기능 제어

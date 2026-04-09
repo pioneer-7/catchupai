@@ -74,7 +74,7 @@ export default function LandingPage() {
           {/* Stats */}
           <div className="mt-16 flex justify-center gap-8 md:gap-14">
             {[
-              { num: '6', label: 'AI 기능' },
+              { num: '5', label: 'AI 기능' },
               { num: '14', label: '페이지' },
               { num: '36', label: '테스트' },
               { num: '11', label: 'API' },
