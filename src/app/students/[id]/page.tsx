@@ -98,9 +98,11 @@ export default function StudentDetailPage() {
   }
 
   async function handleGenerateAll() {
-    await handleGenerate('recovery');
-    await handleGenerate('message');
-    await handleGenerate('assessment');
+    await Promise.all([
+      handleGenerate('recovery'),
+      handleGenerate('message'),
+      handleGenerate('assessment'),
+    ]);
   }
 
   async function handleSubmitAssessment() {

@@ -48,8 +48,10 @@ export const notificationRepository = {
     return data as Notification;
   },
 
-  async markAsRead(id: string): Promise<void> {
-    await db.from('notifications').update({ read: true }).eq('id', id);
+  async markAsRead(id: string, userId?: string): Promise<void> {
+    let query = db.from('notifications').update({ read: true }).eq('id', id);
+    if (userId) query = query.eq('user_id', userId);
+    await query;
   },
 
   async markAllAsRead(userId: string): Promise<void> {

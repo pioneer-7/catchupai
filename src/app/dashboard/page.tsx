@@ -18,12 +18,15 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/students?sort=risk_score&order=desc')
+    const controller = new AbortController();
+    fetch('/api/students?sort=risk_score&order=desc', { signal: controller.signal })
       .then(res => res.json())
       .then(json => {
         if (json.success) setData(json.data);
       })
+      .catch(err => { if (err.name !== 'AbortError') console.error(err); })
       .finally(() => setLoading(false));
+    return () => controller.abort();
   }, []);
 
   if (loading) {

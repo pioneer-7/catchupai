@@ -13,12 +13,12 @@ export interface Organization {
 
 export const organizationRepository = {
   async findById(id: string): Promise<Organization | null> {
-    const { data } = await db.from('organizations').select('*').eq('id', id).single();
+    const { data } = await db.from('organizations').select('*').eq('id', id).maybeSingle();
     return data as Organization | null;
   },
 
   async findByOwner(ownerId: string): Promise<Organization | null> {
-    const { data } = await db.from('organizations').select('*').eq('owner_id', ownerId).limit(1).single();
+    const { data } = await db.from('organizations').select('*').eq('owner_id', ownerId).limit(1).maybeSingle();
     return data as Organization | null;
   },
 

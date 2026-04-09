@@ -3,7 +3,7 @@
 // AI 코칭 챗봇 UI — 스트리밍 + 마크다운 렌더링
 // SSOT: specs/005-ai/chat-spec.md 섹션 6
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -17,14 +17,22 @@ export function ChatBox({ studentId }: { studentId: string }) {
   const [streaming, setStreaming] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, streaming]);
 
-  async function handleSend() {
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
+
+  const handleSend = useCallback(async () => {
     const text = input.trim();
     if (!text || streaming) return;
+
+    abortRef.current?.abort();
+    abortRef.current = new AbortController();
 
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: text }]);
@@ -37,6 +45,7 @@ export function ChatBox({ studentId }: { studentId: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text }),
+        signal: abortRef.current!.signal,
       });
 
       const reader = res.body?.getReader();
@@ -58,7 +67,8 @@ export function ChatBox({ studentId }: { studentId: string }) {
           });
         }
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return;
       setMessages(prev => {
         const updated = [...prev];
         const last = updated[updated.length - 1];
@@ -71,7 +81,7 @@ export function ChatBox({ studentId }: { studentId: string }) {
       setStreaming(false);
       inputRef.current?.focus();
     }
-  }
+  }, [input, streaming, studentId]);
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {

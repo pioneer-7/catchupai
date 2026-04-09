@@ -18,6 +18,9 @@ export async function POST(
     if (!message?.trim()) {
       return errorResponse('VALIDATION_ERROR', '메시지를 입력해주세요', 400);
     }
+    if (message.length > 2000) {
+      return errorResponse('VALIDATION_ERROR', '메시지는 2000자 이내여야 합니다', 400);
+    }
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({

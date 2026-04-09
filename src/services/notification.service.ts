@@ -16,8 +16,8 @@ export const notificationService = {
     return notificationRepository.countUnread(userId);
   },
 
-  async markAsRead(notificationId: string) {
-    return notificationRepository.markAsRead(notificationId);
+  async markAsRead(notificationId: string, userId?: string) {
+    return notificationRepository.markAsRead(notificationId, userId);
   },
 
   async markAllAsRead(userId: string) {

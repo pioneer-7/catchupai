@@ -39,8 +39,12 @@ export function NavHeader() {
       if (devRef.current && !devRef.current.contains(e.target as Node)) setDevOpen(false);
       if (userRef.current && !userRef.current.contains(e.target as Node)) setUserMenuOpen(false);
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') { setDevOpen(false); setUserMenuOpen(false); setMobileOpen(false); }
+    }
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => { document.removeEventListener('mousedown', handleClick); document.removeEventListener('keydown', handleKeyDown); };
   }, []);
 
   if (pathname === '/') return null;

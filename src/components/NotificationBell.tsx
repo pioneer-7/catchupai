@@ -28,13 +28,18 @@ export function NotificationBell() {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => { document.removeEventListener('mousedown', handleClick); document.removeEventListener('keydown', handleKeyDown); };
   }, []);
 
   useEffect(() => {
-    if (!user) return;
-    fetch('/api/notifications')
+    if (!user || !open) return;
+    const controller = new AbortController();
+    fetch('/api/notifications', { signal: controller.signal })
       .then(r => r.json())
       .then(json => {
         if (json.success) {
@@ -42,7 +47,8 @@ export function NotificationBell() {
           setUnreadCount(json.data.unread_count);
         }
       })
-      .catch(() => {});
+      .catch(err => { if (err.name !== 'AbortError') console.error(err); });
+    return () => controller.abort();
   }, [user, open]);
 
   if (!user) return null;

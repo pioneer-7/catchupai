@@ -3,7 +3,7 @@
 // AuthModal — 한 화면 로그인+가입 탭 전환
 // SSOT: specs/004-backend/auth-spec.md 섹션 2.3
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { X, Mail, AlertCircle } from 'lucide-react';
 
@@ -28,7 +28,7 @@ export function AuthModal({
 
   if (!isOpen) return null;
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -50,7 +50,6 @@ export function AuthModal({
         if (error) throw error;
         onClose();
         onSuccess?.();
-        window.location.reload();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '인증 중 오류가 발생했습니다');
@@ -84,7 +83,7 @@ export function AuthModal({
             </div>
             <span className="text-[15px] font-bold tracking-tight">CatchUp AI</span>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-[var(--radius-button)] hover:bg-[var(--bg-warm)] transition">
+          <button onClick={onClose} aria-label="닫기" className="p-1.5 rounded-[var(--radius-button)] hover:bg-[var(--bg-warm)] transition">
             <X size={16} className="text-[var(--text-muted)]" />
           </button>
         </div>
@@ -94,7 +93,7 @@ export function AuthModal({
           {(['login', 'signup'] as Tab[]).map(t => (
             <button
               key={t}
-              onClick={() => { setTab(t); setError(null); }}
+              onClick={() => { setTab(t); setError(null); setEmail(''); setPassword(''); }}
               className={`px-4 py-2.5 text-[13px] border-b-2 transition-all ${
                 tab === t
                   ? 'border-[var(--accent)] text-[var(--accent)]'

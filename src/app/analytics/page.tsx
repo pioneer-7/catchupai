@@ -22,10 +22,13 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/analytics')
+    const controller = new AbortController();
+    fetch('/api/analytics', { signal: controller.signal })
       .then(r => r.json())
       .then(json => { if (json.success) setData(json.data); })
+      .catch(err => { if (err.name !== 'AbortError') console.error(err); })
       .finally(() => setLoading(false));
+    return () => controller.abort();
   }, []);
 
   if (loading) {

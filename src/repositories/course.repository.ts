@@ -4,7 +4,7 @@ import type { Course } from '@/types';
 
 export const courseRepository = {
   async findFirst(): Promise<Course | null> {
-    const { data } = await db.from('courses').select('*').limit(1).single();
+    const { data } = await db.from('courses').select('*').limit(1).maybeSingle();
     return data as Course | null;
   },
 

@@ -427,7 +427,7 @@ Respond in Korean for string fields. Return valid JSON only.`;
     'primary_risk_factors' in parsed
   ) {
     return {
-      dropout_risk_score: Number(parsed.dropout_risk_score) || 0.5,
+      dropout_risk_score: Math.min(1, Math.max(0, Number(parsed.dropout_risk_score) || 0.5)),
       risk_level: (parsed.risk_level as RiskPredictionOutput['risk_level']) || 'medium',
       primary_risk_factors: Array.isArray(parsed.primary_risk_factors) ? parsed.primary_risk_factors.map(String) : ['데이터 기반 평가'],
       trajectory: (parsed.trajectory as RiskPredictionOutput['trajectory']) || 'stable',

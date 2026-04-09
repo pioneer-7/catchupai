@@ -3,7 +3,7 @@
 // 전역 인증 상태 + AuthModal 관리
 // SSOT: specs/004-backend/auth-spec.md
 
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { AuthModal } from '@/components/AuthModal';
 import type { User } from '@supabase/supabase-js';
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [showModal, setShowModal] = useState(false);
   const [pendingCallback, setPendingCallback] = useState<(() => void) | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {

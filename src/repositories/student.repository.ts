@@ -4,12 +4,12 @@ import type { Student } from '@/types';
 
 export const studentRepository = {
   async findById(id: string): Promise<Student | null> {
-    const { data } = await db.from('students').select('*').eq('id', id).single();
+    const { data } = await db.from('students').select('*').eq('id', id).maybeSingle();
     return data as Student | null;
   },
 
   async findByName(name: string): Promise<Student | null> {
-    const { data } = await db.from('students').select('*').eq('name', name).limit(1).single();
+    const { data } = await db.from('students').select('*').eq('name', name).limit(1).maybeSingle();
     return data as Student | null;
   },
 

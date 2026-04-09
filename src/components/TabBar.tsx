@@ -24,12 +24,14 @@ export function TabBar({
 }) {
   return (
     <div className="border-b border-[var(--border)] flex items-center overflow-x-auto scrollbar-none">
-      <div className="flex">
+      <div className="flex" role="tablist">
         {tabs.map(tab => {
           const active = activeTab === tab.id;
           return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={active}
               onClick={() => onTabChange(tab.id)}
               className={`flex items-center gap-1.5 px-4 py-3 text-[13px] whitespace-nowrap transition-all border-b-2 focus-ring ${
                 active
