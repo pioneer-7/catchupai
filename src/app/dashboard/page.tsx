@@ -9,6 +9,7 @@ import { RiskBadge } from '@/components/RiskBadge';
 import { FadeIn } from '@/components/FadeIn';
 import { RiskChart } from '@/components/RiskChart';
 import { EmptyState } from '@/components/EmptyState';
+import { SkeletonCard } from '@/components/Skeleton';
 import { Users, CheckCircle, AlertTriangle, XCircle, ArrowRight } from 'lucide-react';
 import type { StudentListData } from '@/types';
 
@@ -31,7 +32,7 @@ export default function DashboardPage() {
         <h1 className="text-2xl heading-md mb-8">대시보드</h1>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-28 rounded-[var(--radius-card)] bg-[var(--bg-warm)] animate-pulse" />
+            <SkeletonCard key={i} />
           ))}
         </div>
       </main>

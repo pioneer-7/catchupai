@@ -149,6 +149,7 @@ export function NavHeader() {
             <div ref={userRef} className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
+                aria-label="사용자 메뉴"
                 className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold text-white transition-transform hover:scale-105"
                 style={{ background: 'var(--gradient-accent)' }}
               >

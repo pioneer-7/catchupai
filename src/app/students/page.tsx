@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { RiskBadge } from '@/components/RiskBadge';
 import { EmptyState } from '@/components/EmptyState';
+import { SkeletonTable } from '@/components/Skeleton';
 import { ChevronDown, ChevronUp, ChevronsUpDown, ArrowRight, Users } from 'lucide-react';
 import type { StudentListData, RiskLevel } from '@/types';
 
@@ -72,7 +73,8 @@ export default function StudentsPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <input
-          type="text"
+          type="search"
+          aria-label="학생 이름 검색"
           placeholder="학생 이름 검색..."
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -97,11 +99,7 @@ export default function StudentsPage() {
 
       {/* Table */}
       {loading ? (
-        <div className="space-y-3">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-16 rounded-[var(--radius-card)] bg-[var(--bg-warm)] animate-pulse" />
-          ))}
-        </div>
+        <SkeletonTable rows={4} cols={5} />
       ) : !data || data.students.length === 0 ? (
         <EmptyState
           icon={search || riskFilter !== 'all' ? 'search' : 'students'}

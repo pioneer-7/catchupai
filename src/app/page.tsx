@@ -70,6 +70,21 @@ export default function LandingPage() {
               가격 보기 →
             </Link>
           </div>
+
+          {/* Stats */}
+          <div className="mt-16 flex justify-center gap-8 md:gap-14">
+            {[
+              { num: '6', label: 'AI 기능' },
+              { num: '14', label: '페이지' },
+              { num: '36', label: '테스트' },
+              { num: '11', label: 'API' },
+            ].map(({ num, label }) => (
+              <div key={label} className="text-center">
+                <div className="text-2xl md:text-3xl heading-lg text-[var(--accent)]">{num}</div>
+                <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontWeight: 510 }}>{label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

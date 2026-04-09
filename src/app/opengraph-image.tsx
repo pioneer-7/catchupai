@@ -1,4 +1,4 @@
-// OG Image — Next.js 이미��� 생성 (ImageResponse)
+// OG Image — Next.js 이미지 생성 (ImageResponse)
 
 import { ImageResponse } from 'next/og';
 
@@ -12,18 +12,18 @@ export default async function Image() {
     (
       <div
         style={{
+          background: 'linear-gradient(135deg, #faf9f7 0%, #f0eee9 50%, #e8e5df 100%)',
           width: '100%',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'white',
-          fontFamily: 'Inter, sans-serif',
+          fontFamily: 'sans-serif',
         }}
       >
         {/* Top accent bar */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: '#0075de' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'linear-gradient(90deg, #5B5BD6, #7C7CFF)' }} />
 
         {/* Logo */}
         <div
@@ -31,14 +31,14 @@ export default async function Image() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 64,
-            height: 64,
-            borderRadius: 16,
-            background: '#0075de',
+            width: 72,
+            height: 72,
+            borderRadius: 18,
+            background: 'linear-gradient(135deg, #5B5BD6, #7C7CFF)',
             color: 'white',
-            fontSize: 32,
+            fontSize: 36,
             fontWeight: 700,
-            marginBottom: 24,
+            marginBottom: 28,
           }}
         >
           C
@@ -48,9 +48,9 @@ export default async function Image() {
         <div
           style={{
             fontSize: 56,
-            fontWeight: 700,
+            fontWeight: 800,
             letterSpacing: '-2px',
-            color: 'rgba(0,0,0,0.95)',
+            color: '#1a1a1a',
           }}
         >
           CatchUp AI
@@ -60,51 +60,39 @@ export default async function Image() {
         <div
           style={{
             fontSize: 24,
-            fontWeight: 600,
-            color: '#615d59',
-            marginTop: 16,
-            maxWidth: 700,
+            color: '#6b6b6b',
+            marginTop: 14,
+            maxWidth: 600,
             textAlign: 'center',
-            lineHeight: 1.4,
+            lineHeight: 1.5,
           }}
         >
-          학습 이탈 방지 AI 코파일럿
+          학습 이탈 방지 AI 코파���럿
         </div>
 
-        {/* Features */}
+        {/* Stats */}
         <div
           style={{
             display: 'flex',
-            gap: 32,
-            marginTop: 40,
+            gap: 48,
+            marginTop: 44,
           }}
         >
-          {['위험 탐지', 'AI 회복학습', '개입 메시지', '미니 진단'].map(f => (
-            <div
-              key={f}
-              style={{
-                fontSize: 16,
-                fontWeight: 600,
-                color: '#0075de',
-                background: '#f2f9ff',
-                padding: '8px 20px',
-                borderRadius: 9999,
-              }}
-            >
-              {f}
+          {[
+            { num: '6', label: 'AI Features' },
+            { num: '14', label: 'Pages' },
+            { num: '36', label: 'Tests' },
+            { num: '11', label: 'APIs' },
+          ].map((stat) => (
+            <div key={stat.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ fontSize: 36, fontWeight: 700, color: '#5B5BD6' }}>{stat.num}</div>
+              <div style={{ fontSize: 14, color: '#8b8b8b', marginTop: 4 }}>{stat.label}</div>
             </div>
           ))}
         </div>
 
         {/* Footer */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 32,
-            fontSize: 14,
-            color: '#a39e98',
-          }}
-        >
+        <div style={{ position: 'absolute', bottom: 28, fontSize: 14, color: '#a39e98' }}>
           carchupai.vercel.app
         </div>
       </div>

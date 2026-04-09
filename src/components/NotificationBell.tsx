@@ -92,6 +92,7 @@ export function NotificationBell() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
+        aria-label={`알림${unreadCount > 0 ? ` (${unreadCount}개 읽지 않음)` : ''}`}
         className="relative p-2 rounded-[var(--radius-button)] hover:bg-[var(--bg-warm)] transition"
       >
         <Bell size={16} strokeWidth={1.8} className="text-[var(--text-secondary)]" />
