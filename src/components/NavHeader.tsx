@@ -49,15 +49,13 @@ export function NavHeader() {
 
   if (pathname === '/') return null;
 
-  function handleReset() {
-    requireAuth(async () => {
-      setResetting(true);
-      await fetch('/api/upload/sample', { method: 'POST' });
-      setResetting(false);
-      setMobileOpen(false);
-      router.push('/dashboard');
-      router.refresh();
-    });
+  async function handleReset() {
+    setResetting(true);
+    await fetch('/api/upload/sample', { method: 'POST' });
+    setResetting(false);
+    setMobileOpen(false);
+    router.push('/dashboard');
+    router.refresh();
   }
 
   const isDevPage = ['/docs', '/integration', '/demo'].some(p => pathname.startsWith(p));
