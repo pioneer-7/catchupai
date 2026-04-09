@@ -8,10 +8,10 @@ export async function GET() {
       title: 'CatchUp AI API',
       version: '1.0.0',
       description: '학습 이탈 방지 AI 코파일럿 — 위험 학습자 탐지, 회복학습 생성, 개입 메시지, 미니 진단',
-      contact: { name: 'CatchUp AI', url: 'https://carchupai.vercel.app' },
+      contact: { name: 'CatchUp AI', url: 'https://catchupai.vercel.app' },
     },
     servers: [
-      { url: 'https://carchupai.vercel.app/api/v1', description: 'Production' },
+      { url: 'https://catchupai.vercel.app/api/v1', description: 'Production' },
     ],
     security: [{ ApiKeyAuth: [] }],
     paths: {

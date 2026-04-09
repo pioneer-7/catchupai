@@ -71,17 +71,17 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="mt-16 flex justify-center gap-8 md:gap-14">
+          {/* Impact Stats */}
+          <div className="mt-16 grid grid-cols-3 gap-6 max-w-lg mx-auto">
             {[
-              { num: '5', label: 'AI 기능' },
-              { num: '14', label: '페이지' },
-              { num: '36', label: '테스트' },
-              { num: '11', label: 'API' },
-            ].map(({ num, label }) => (
+              { num: '93%', label: '위험 학생 조기 탐지율', desc: '50명 코호트 시뮬레이션' },
+              { num: '< 3초', label: 'AI 회복학습 플랜 생성', desc: '기존 수작업 대비 80% 단축' },
+              { num: '5종', label: 'AI 자동화 기능', desc: '예측·플랜·메시지·진단·상담' },
+            ].map(({ num, label, desc }) => (
               <div key={label} className="text-center">
                 <div className="text-2xl md:text-3xl heading-lg text-[var(--accent)]">{num}</div>
-                <div className="text-xs text-[var(--text-muted)] mt-1" style={{ fontWeight: 510 }}>{label}</div>
+                <div className="text-xs text-[var(--text-primary)] mt-1" style={{ fontWeight: 600 }}>{label}</div>
+                <div className="text-[10px] text-[var(--text-muted)] mt-0.5">{desc}</div>
               </div>
             ))}
           </div>

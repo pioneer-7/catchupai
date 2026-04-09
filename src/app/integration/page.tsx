@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 
-const BASE = 'https://carchupai.vercel.app';
+const BASE = 'https://catchupai.vercel.app';
 
 const WIDGET_TYPES = [
   { id: 'risk-summary', label: '코스 위험 요약', width: 400, height: 320, params: ['api_key'] },

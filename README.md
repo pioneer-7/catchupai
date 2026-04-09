@@ -8,7 +8,7 @@
 [![AI](https://img.shields.io/badge/AI%20features-5-purple)](#ai-활용-전략)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-yellow)](#cicd)
 
-**Live Demo**: [https://carchupai.vercel.app](https://carchupai.vercel.app)
+**Live Demo**: [https://catchupai.vercel.app](https://catchupai.vercel.app)
 
 ---
 
@@ -81,10 +81,10 @@ CatchUp AI는 독립 앱뿐 아니라, **기존 LMS/ERP에 통합 가능한 API 
 
 | 기능 | 설명 | 링크 |
 |------|------|------|
-| **REST API v1** | 11개 엔드포인트, API 키 인증, OpenAPI 3.0 | [`/docs`](https://carchupai.vercel.app/docs) |
+| **REST API v1** | 11개 엔드포인트, API 키 인증, OpenAPI 3.0 | [`/docs`](https://catchupai.vercel.app/docs) |
 | **Webhook** | 이벤트 구독 (risk 변경, 회복학습 생성 등), HMAC-SHA256 서명 | `POST /api/v1/webhooks` |
-| **임베더블 위젯** | iframe으로 LMS에 삽입 가능한 위험 요약/학생 카드 | [`/integration`](https://carchupai.vercel.app/integration) |
-| **LMS 통합 데모** | 가상 LMS에 위젯이 삽입된 모습 시연 | [`/demo/lms`](https://carchupai.vercel.app/demo/lms) |
+| **임베더블 위젯** | iframe으로 LMS에 삽입 가능한 위험 요약/학생 카드 | [`/integration`](https://catchupai.vercel.app/integration) |
+| **LMS 통합 데모** | 가상 LMS에 위젯이 삽입된 모습 시연 | [`/demo/lms`](https://catchupai.vercel.app/demo/lms) |
 
 ---
 

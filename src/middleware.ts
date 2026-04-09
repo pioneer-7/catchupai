@@ -4,8 +4,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PROTECTED_ROUTES = ['/dashboard', '/students', '/analytics', '/upload', '/onboarding', '/settings'];
-const PUBLIC_ROUTES = ['/', '/pricing', '/docs', '/integration', '/demo', '/widget', '/api', '/auth'];
+// 인증 필수: 데이터 변경 작업
+const PROTECTED_ROUTES = ['/upload', '/onboarding', '/settings'];
+// 인증 없이 열람 가능 (읽기 전용 데모 모드)
+const PUBLIC_ROUTES = ['/', '/pricing', '/docs', '/integration', '/demo', '/widget', '/api', '/auth', '/dashboard', '/students', '/analytics'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

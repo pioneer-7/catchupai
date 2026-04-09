@@ -93,7 +93,7 @@ export default async function Image() {
 
         {/* Footer */}
         <div style={{ position: 'absolute', bottom: 28, fontSize: 14, color: '#a39e98' }}>
-          carchupai.vercel.app
+          catchupai.vercel.app
         </div>
       </div>
     ),

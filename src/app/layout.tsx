@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://carchupai.vercel.app"),
+  metadataBase: new URL("https://catchupai.vercel.app"),
   title: "CatchUp AI — 학습 이탈 방지 AI 코파일럿",
   description: "수업을 놓친 학생을 조기에 발견하고, 개인 맞춤형 회복학습 경로를 생성해주는 교육 현장용 AI 코파일럿. Claude AI 기반 5가지 교육 특화 기능.",
   icons: {
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: "CatchUp AI — 학습 이탈 방지 AI 코파일럿",
     description: "위험 학습자 조기 탐지 + AI 맞춤 회복학습 + 개입 메시지 자동 생성. 14 Pages, 5 AI Features, 36 Tests.",
     type: "website",
-    url: "https://carchupai.vercel.app",
+    url: "https://catchupai.vercel.app",
     siteName: "CatchUp AI",
   },
   twitter: {

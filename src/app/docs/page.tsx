@@ -3,38 +3,53 @@
 // API 문서 페이지 — Redoc 동적 로드
 // SSOT: specs/004-backend/openapi-spec.md
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function DocsPage() {
   const redocRef = useRef<HTMLDivElement>(null);
   const loaded = useRef(false);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
   useEffect(() => {
     if (loaded.current) return;
     loaded.current = true;
 
+    // 10초 타임아웃
+    const timeout = setTimeout(() => {
+      if (status === 'loading') setStatus('error');
+    }, 10000);
+
     const script = document.createElement('script');
     script.src = 'https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js';
     script.onload = () => {
+      clearTimeout(timeout);
       if (redocRef.current && (window as unknown as Record<string, unknown>).Redoc) {
         (window as unknown as { Redoc: { init: (specUrl: string, options: Record<string, unknown>, element: HTMLElement) => void } }).Redoc.init(
           '/api/v1/openapi.json',
           {
             hideDownloadButton: true,
             theme: {
-              colors: { primary: { main: '#0075de' } },
+              colors: { primary: { main: '#5B5BD6' } },
               typography: {
                 fontFamily: 'Inter, -apple-system, sans-serif',
                 headings: { fontFamily: 'Inter, -apple-system, sans-serif' },
               },
-              sidebar: { backgroundColor: '#f6f5f4' },
+              sidebar: { backgroundColor: '#faf9f7' },
             },
           },
           redocRef.current
         );
+        setStatus('ready');
       }
     };
+    script.onerror = () => {
+      clearTimeout(timeout);
+      setStatus('error');
+    };
     document.body.appendChild(script);
+
+    return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -63,12 +78,26 @@ export default function DocsPage() {
 
       {/* Redoc 렌더링 영역 */}
       <div ref={redocRef} id="redoc-container">
-        <div className="flex items-center justify-center py-24">
-          <div className="flex items-center gap-3 text-[var(--text-muted)]">
-            <span className="h-5 w-5 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-muted)] rounded-full animate-spin" />
-            API 문서 로딩 중...
+        {status === 'loading' && (
+          <div className="flex items-center justify-center py-24">
+            <div className="flex items-center gap-3 text-[var(--text-muted)]">
+              <span className="h-5 w-5 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-muted)] rounded-full animate-spin" />
+              API 문서 로딩 중...
+            </div>
           </div>
-        </div>
+        )}
+        {status === 'error' && (
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <p className="text-[var(--text-secondary)]">API 문서 렌더링에 실패했습니다.</p>
+            <a
+              href="/api/v1/openapi.json"
+              target="_blank"
+              className="btn-primary text-sm"
+            >
+              OpenAPI JSON 직접 보기 →
+            </a>
+          </div>
+        )}
       </div>
     </main>
   );

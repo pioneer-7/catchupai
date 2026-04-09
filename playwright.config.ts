@@ -5,7 +5,7 @@ export default defineConfig({
   timeout: 30000,
   retries: 1,
   use: {
-    baseURL: process.env.BASE_URL || 'https://carchupai.vercel.app',
+    baseURL: process.env.BASE_URL || 'https://catchupai.vercel.app',
     headless: true,
     viewport: { width: 1280, height: 720 },
   },
