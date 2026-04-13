@@ -65,15 +65,15 @@ export default function LandingPage() {
         className="flex flex-col items-center justify-center px-6 py-32 md:py-44"
         style={{ background: 'var(--gradient-hero)' }}
       >
-        <div className="text-center max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-light)] text-[var(--accent-text)] text-xs mb-8" style={{ fontWeight: 510 }}>
+        <div className="text-center max-w-4xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-light)] text-[var(--accent-text)] text-xs mb-8 whitespace-nowrap" style={{ fontWeight: 510 }}>
             <Sparkles size={12} />
             AI 기반 학습 이탈 방지 플랫폼
           </div>
           <h1 className="text-5xl md:text-[64px] heading-xl">
             CatchUp AI
           </h1>
-          <p className="mt-6 text-lg md:text-xl leading-relaxed text-[var(--text-secondary)] max-w-lg mx-auto">
+          <p className="mt-6 whitespace-nowrap text-[17px] sm:text-lg md:text-xl leading-relaxed text-[var(--text-secondary)] max-w-none mx-auto">
             학생이 이탈하기 전에, 교육 현장이 먼저 개입할 수 있도록.
           </p>
 
@@ -122,7 +122,7 @@ export default function LandingPage() {
           <h2 className="text-3xl md:text-4xl heading-lg text-center mb-4">
             탐지에서 회복까지, 끊김 없는 AI 파이프라인
           </h2>
-          <p className="text-center text-[var(--text-secondary)] mb-16 max-w-xl mx-auto">
+          <p className="text-center text-[15px] md:text-base text-[var(--text-secondary)] mb-16 max-w-none mx-auto whitespace-nowrap">
             위험 신호 발견부터 학습 회복 확인까지, 교강사의 전체 개입 과정을 AI가 지원합니다.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
