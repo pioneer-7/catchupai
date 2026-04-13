@@ -1,4 +1,3 @@
-// Upload Service — CSV 업로드 + 샘플 데이터 비즈니스 로직
 import Papa from 'papaparse';
 import { studentRepository } from '@/repositories/student.repository';
 import { courseRepository } from '@/repositories/course.repository';
@@ -10,9 +9,15 @@ import { calculateRisk } from '@/lib/risk-scoring';
 import { StudentUploadRowSchema } from '@/lib/validation';
 import { SAMPLE_COURSE, SAMPLE_STUDENTS, SAMPLE_MATERIAL_TEXT } from '@/lib/sample-data';
 
+const SAMPLE_VISIBILITY_RETRIES = 5;
+const SAMPLE_VISIBILITY_DELAY_MS = 150;
+
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export const uploadService = {
   async loadSampleData(): Promise<{ course_id: string; total_rows: number }> {
-    // 기존 데이터 정리 (역순 — FK 의존성)
     await assessmentRepository.deleteAll();
     await interventionMessageRepository.deleteAll();
     await recoveryPlanRepository.deleteAll();
@@ -20,26 +25,32 @@ export const uploadService = {
     await studentRepository.deleteAll();
     await courseRepository.deleteAll();
 
-    // 과정 생성
     const course = await courseRepository.save({
       title: SAMPLE_COURSE.title,
       description: SAMPLE_COURSE.description,
       uploaded_material_text: SAMPLE_MATERIAL_TEXT,
     });
 
-    // 학생 + progress 생성
     for (const s of SAMPLE_STUDENTS) {
       await this.upsertStudentWithProgress(s, course.id);
     }
 
-    return { course_id: course.id, total_rows: SAMPLE_STUDENTS.length };
+    // Avoid navigating from the landing CTA before the list query can see the seeded rows.
+    for (let attempt = 0; attempt < SAMPLE_VISIBILITY_RETRIES; attempt++) {
+      const rows = await progressRepository.findAllWithStudents();
+      if (rows.length >= SAMPLE_STUDENTS.length) {
+        return { course_id: course.id, total_rows: SAMPLE_STUDENTS.length };
+      }
+      await delay(SAMPLE_VISIBILITY_DELAY_MS);
+    }
+
+    throw new Error('SAMPLE_DATA_NOT_VISIBLE');
   },
 
   async importFromCSV(text: string): Promise<{ total_rows: number; processed: number; skipped: number; course_id: string }> {
     const parsed = Papa.parse<Record<string, string>>(text, { header: true, skipEmptyLines: true });
     if (!parsed.data.length) throw new Error('EMPTY_CSV');
 
-    // Validate required columns
     const headers = Object.keys(parsed.data[0]);
     const required = ['student_name', 'attendance_rate', 'missed_sessions', 'assignment_submission_rate', 'avg_quiz_score', 'last_active_days_ago'];
     const missing = required.filter(c => !headers.includes(c));
@@ -55,7 +66,10 @@ export const uploadService = {
 
     for (const row of parsed.data) {
       const result = StudentUploadRowSchema.safeParse(row);
-      if (!result.success) { skipped++; continue; }
+      if (!result.success) {
+        skipped++;
+        continue;
+      }
 
       await this.upsertStudentWithProgress({
         name: result.data.student_name,

@@ -16,6 +16,7 @@ export function SampleDataButton({ className }: { className?: string }) {
       const res = await fetch('/api/upload/sample', { method: 'POST' });
       if (!res.ok) throw new Error('Failed to load sample data');
       router.push('/dashboard');
+      router.refresh();
     } catch {
       alert('샘플 데이터 로드에 실패했습니다. 다시 시도해주세요.');
       setLoading(false);
