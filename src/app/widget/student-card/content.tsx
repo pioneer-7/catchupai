@@ -11,17 +11,21 @@ export default function StudentCardContent() {
   const apiKey = searchParams.get('api_key');
   const [data, setData] = useState<StudentDetailData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const validationError = !apiKey
+    ? 'API 키가 필요합니다'
+    : !studentId
+      ? 'student_id가 필요합니다'
+      : null;
 
   useEffect(() => {
-    if (!apiKey) { setError('API 키가 필요합니다'); return; }
-    if (!studentId) { setError('student_id가 필요합니다'); return; }
+    if (validationError || !apiKey || !studentId) return;
     fetch(`/api/v1/students/${studentId}`, { headers: { 'X-API-Key': apiKey } })
       .then(r => r.json())
-      .then(json => { if (json.success) setData(json.data); else setError(json.error?.message || '학생을 찾을 수 없습니다'); })
+      .then(json => { if (json.success) { setData(json.data); setError(null); } else setError(json.error?.message || '학생을 찾을 수 없습니다'); })
       .catch(() => setError('연결 오류'));
-  }, [studentId, apiKey]);
+  }, [studentId, apiKey, validationError]);
 
-  if (error) return <div className="p-6 text-center"><p className="text-sm text-[var(--status-risk)]">{error}</p></div>;
+  if (validationError || error) return <div className="p-6 text-center"><p className="text-sm text-[var(--status-risk)]">{validationError || error}</p></div>;
   if (!data) return <div className="p-5 space-y-3"><div className="h-6 w-24 rounded bg-[var(--bg-warm)] animate-pulse" /><div className="h-10 rounded bg-[var(--bg-warm)] animate-pulse" /></div>;
 
   const { student, progress: p } = data;

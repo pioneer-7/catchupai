@@ -10,16 +10,17 @@ export default function RiskSummaryContent() {
   const apiKey = searchParams.get('api_key');
   const [data, setData] = useState<StudentListData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const validationError = apiKey ? null : 'API 키가 필요합니다';
 
   useEffect(() => {
-    if (!apiKey) { setError('API 키가 필요합니다'); return; }
+    if (validationError || !apiKey) return;
     fetch('/api/v1/students?sort=risk_score&order=desc', { headers: { 'X-API-Key': apiKey } })
       .then(r => r.json())
-      .then(json => { if (json.success) setData(json.data); else setError(json.error?.message || '오류'); })
+      .then(json => { if (json.success) { setData(json.data); setError(null); } else setError(json.error?.message || '오류'); })
       .catch(() => setError('연결 오류'));
-  }, [apiKey]);
+  }, [apiKey, validationError]);
 
-  if (error) return <div className="p-6 text-center"><p className="text-sm text-[var(--status-risk)]">{error}</p></div>;
+  if (validationError || error) return <div className="p-6 text-center"><p className="text-sm text-[var(--status-risk)]">{validationError || error}</p></div>;
   if (!data) return <div className="p-6 space-y-3">{[...Array(3)].map((_, i) => <div key={i} className="h-8 rounded bg-[var(--bg-warm)] animate-pulse" />)}</div>;
 
   const topStudents = data.students.slice(0, 3);

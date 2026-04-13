@@ -4,6 +4,7 @@
 // SSOT: specs/004-backend/notification-spec.md 섹션 4
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Bell, Check } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
 
@@ -15,10 +16,22 @@ interface NotificationItem {
   link: string | null;
   read: boolean;
   created_at: string;
+  relative_time: string;
+}
+
+function formatTimeAgo(iso: string, now: number) {
+  const diff = now - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return '방금';
+  if (mins < 60) return `${mins}분 전`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}시간 전`;
+  return `${Math.floor(hours / 24)}일 전`;
 }
 
 export function NotificationBell() {
   const { user } = useAuth();
+  const router = useRouter();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
@@ -43,7 +56,11 @@ export function NotificationBell() {
       .then(r => r.json())
       .then(json => {
         if (json.success) {
-          setNotifications(json.data.notifications);
+          const now = Date.now();
+          setNotifications(json.data.notifications.map((item: Omit<NotificationItem, 'relative_time'>) => ({
+            ...item,
+            relative_time: formatTimeAgo(item.created_at, now),
+          })));
           setUnreadCount(json.data.unread_count);
         }
       })
@@ -73,18 +90,8 @@ export function NotificationBell() {
       setUnreadCount(prev => Math.max(0, prev - 1));
       setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, read: true } : item));
     }
-    if (n.link) window.location.href = n.link;
+    if (n.link) router.push(n.link);
     setOpen(false);
-  }
-
-  function timeAgo(iso: string) {
-    const diff = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return '방금';
-    if (mins < 60) return `${mins}분 전`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}시간 전`;
-    return `${Math.floor(hours / 24)}일 전`;
   }
 
   const TYPE_ICONS: Record<string, string> = {
@@ -142,7 +149,7 @@ export function NotificationBell() {
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] truncate" style={{ fontWeight: n.read ? 400 : 510 }}>{n.title}</p>
                       <p className="text-[12px] text-[var(--text-secondary)] truncate">{n.message}</p>
-                      <p className="text-[11px] text-[var(--text-muted)] mt-1">{timeAgo(n.created_at)}</p>
+                      <p className="text-[11px] text-[var(--text-muted)] mt-1">{n.relative_time}</p>
                     </div>
                     {!n.read && <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: 'var(--accent)' }} />}
                   </div>

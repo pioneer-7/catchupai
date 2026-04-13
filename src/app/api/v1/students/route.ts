@@ -4,7 +4,7 @@
 import { type NextRequest } from 'next/server';
 import { studentService } from '@/services/student.service';
 import { validateApiKey } from '@/lib/api-auth';
-import { successResponse, errorResponse } from '@/lib/api-helpers';
+import { errorResponse } from '@/lib/api-helpers';
 import type { RiskLevel } from '@/types';
 
 export async function GET(request: NextRequest) {

@@ -4,6 +4,8 @@
 // SSOT: specs/003-frontend/analytics-spec.md 섹션 2.3
 
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Cell } from 'recharts';
+import type { TooltipPayloadEntry, TooltipValueType } from 'recharts';
+import type { ReactNode } from 'react';
 
 interface EffectData {
   name: string;
@@ -42,10 +44,10 @@ export function InterventionEffectChart({ data }: { data: EffectData[] }) {
             />
             <Tooltip
               contentStyle={{ background: 'rgba(49,48,46,0.95)', border: 'none', borderRadius: 8, color: '#fff', fontSize: 13 }}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              formatter={(value: any, name: any) => [value, name === 'x' ? '개입 전' : '개입 후']}
-              labelFormatter={(_: any, payload: any) => {
-                if (payload?.[0]?.payload?.name) return payload[0].payload.name;
+              formatter={(value, name) => [value, name === 'x' ? '개입 전' : '개입 후']}
+              labelFormatter={(_label: ReactNode, payload: ReadonlyArray<TooltipPayloadEntry<TooltipValueType, string | number>>) => {
+                const name = payload[0]?.payload?.name;
+                if (typeof name === 'string') return name;
                 return '';
               }}
             />

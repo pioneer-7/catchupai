@@ -1,65 +1,93 @@
 'use client';
 
-// API 문서 페이지 — Redoc 동적 로드
+// API documentation page with Redoc embedded on the client.
 // SSOT: specs/004-backend/openapi-spec.md
 
-import { useEffect, useRef, useState } from 'react';
+import Script from 'next/script';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+type RedocWindow = Window & {
+  Redoc?: {
+    init: (
+      specUrl: string,
+      options: Record<string, unknown>,
+      element: HTMLElement
+    ) => void;
+  };
+};
 
 export default function DocsPage() {
   const redocRef = useRef<HTMLDivElement>(null);
-  const loaded = useRef(false);
+  const initialized = useRef(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mounted = useRef(false);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
   useEffect(() => {
-    if (loaded.current) return;
-    loaded.current = true;
-
-    // 10초 타임아웃
-    const timeout = setTimeout(() => {
-      if (status === 'loading') setStatus('error');
+    mounted.current = true;
+    timeoutRef.current = setTimeout(() => {
+      if (mounted.current && !initialized.current) {
+        setStatus('error');
+      }
     }, 10000);
 
-    const script = document.createElement('script');
-    script.src = 'https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js';
-    script.onload = () => {
-      clearTimeout(timeout);
-      if (redocRef.current && (window as unknown as Record<string, unknown>).Redoc) {
-        (window as unknown as { Redoc: { init: (specUrl: string, options: Record<string, unknown>, element: HTMLElement) => void } }).Redoc.init(
-          '/api/v1/openapi.json',
-          {
-            hideDownloadButton: true,
-            theme: {
-              colors: { primary: { main: '#5B5BD6' } },
-              typography: {
-                fontFamily: 'Inter, -apple-system, sans-serif',
-                headings: { fontFamily: 'Inter, -apple-system, sans-serif' },
-              },
-              sidebar: { backgroundColor: '#faf9f7' },
-            },
-          },
-          redocRef.current
-        );
-        setStatus('ready');
+    return () => {
+      mounted.current = false;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
     };
-    script.onerror = () => {
-      clearTimeout(timeout);
-      setStatus('error');
-    };
-    document.body.appendChild(script);
+  }, []);
 
-    return () => clearTimeout(timeout);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const initRedoc = useCallback(() => {
+    if (initialized.current || !redocRef.current) return;
+
+    const redoc = (window as RedocWindow).Redoc;
+    if (!redoc) {
+      setStatus('error');
+      return;
+    }
+
+    initialized.current = true;
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    redoc.init(
+      '/api/v1/openapi.json',
+      {
+        hideDownloadButton: true,
+        theme: {
+          colors: { primary: { main: '#5B5BD6' } },
+          typography: {
+            fontFamily: 'Inter, -apple-system, sans-serif',
+            headings: { fontFamily: 'Inter, -apple-system, sans-serif' },
+          },
+          sidebar: { backgroundColor: '#faf9f7' },
+        },
+      },
+      redocRef.current
+    );
+
+    if (mounted.current) {
+      setStatus('ready');
+    }
   }, []);
 
   return (
     <main className="flex-1">
-      {/* Header */}
+      <Script
+        src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"
+        strategy="afterInteractive"
+        onReady={initRedoc}
+        onError={() => setStatus('error')}
+      />
+
       <div className="bg-[var(--bg-warm)] px-6 py-8 border-b border-[var(--border)]">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl heading-md">API Documentation</h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            기존 LMS/ERP에 학습 이탈 탐지를 추가하는 REST API — 학생 위험도 조회, AI 회복학습 생성, 위젯 임베드
+            기존 LMS/ERP에 학습 데이터 연동을 추가하는 REST API로 학생 위험도 조회, AI 회복학습 생성, 개입 메시지 자동화를 제공합니다.
           </p>
           <div className="mt-4 flex gap-3">
             <span className="px-3 py-1 text-xs font-semibold rounded-full bg-[var(--accent-light)] text-[var(--accent-text)]">
@@ -70,14 +98,13 @@ export default function DocsPage() {
               target="_blank"
               className="px-3 py-1 text-xs font-semibold rounded-full bg-[var(--bg-warm-hover)] text-[var(--text-secondary)] hover:text-[var(--accent)]"
             >
-              OpenAPI JSON →
+              OpenAPI JSON 보기
             </a>
           </div>
         </div>
       </div>
 
-      {/* Redoc 렌더링 영역 */}
-      <div ref={redocRef} id="redoc-container">
+      <div className="relative">
         {status === 'loading' && (
           <div className="flex items-center justify-center py-24">
             <div className="flex items-center gap-3 text-[var(--text-muted)]">
@@ -94,10 +121,11 @@ export default function DocsPage() {
               target="_blank"
               className="btn-primary text-sm"
             >
-              OpenAPI JSON 직접 보기 →
+              OpenAPI JSON 직접 보기
             </a>
           </div>
         )}
+        <div ref={redocRef} id="redoc-container" />
       </div>
     </main>
   );

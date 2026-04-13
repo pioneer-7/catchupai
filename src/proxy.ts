@@ -9,7 +9,7 @@ const PROTECTED_ROUTES = ['/upload', '/onboarding', '/settings'];
 // 인증 없이 열람 가능 (읽기 전용 데모 모드)
 const PUBLIC_ROUTES = ['/', '/pricing', '/docs', '/integration', '/demo', '/widget', '/api', '/auth', '/dashboard', '/students', '/analytics'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 공개 라우트 체크

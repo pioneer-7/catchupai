@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabase.auth]);
 
   const requireAuth = useCallback((callback?: () => void) => {
     if (user) {
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setUser(null);
     window.location.href = '/';
-  }, []);
+  }, [supabase.auth]);
 
   function handleAuthSuccess() {
     pendingCallback?.();

@@ -52,7 +52,7 @@ export default function StudentsPage() {
     }
   }
 
-  function SortIcon({ column }: { column: string }) {
+  function renderSortIcon(column: string) {
     if (sortKey !== column) return <ChevronsUpDown size={13} className="inline ml-1 text-[var(--text-muted)]" />;
     return sortOrder === 'desc'
       ? <ChevronDown size={13} className="inline ml-1 text-[var(--accent)]" />
@@ -119,15 +119,15 @@ export default function StudentsPage() {
                 <th className="px-5 py-3" style={{ fontWeight: 510, fontSize: 13 }}>이름</th>
                 <th className="px-5 py-3" style={{ fontWeight: 510, fontSize: 13 }}>상태</th>
                 <th className="px-5 py-3 cursor-pointer select-none" style={{ fontWeight: 510, fontSize: 13 }} onClick={() => toggleSort('risk_score')}>
-                  위험 점수<SortIcon column="risk_score" />
+                  위험 점수{renderSortIcon('risk_score')}
                 </th>
                 <th className="px-5 py-3 cursor-pointer select-none" style={{ fontWeight: 510, fontSize: 13 }} onClick={() => toggleSort('missed_sessions')}>
-                  결석<SortIcon column="missed_sessions" />
+                  결석{renderSortIcon('missed_sessions')}
                 </th>
                 <th className="px-5 py-3" style={{ fontWeight: 510, fontSize: 13 }}>과제 제출률</th>
                 <th className="px-5 py-3" style={{ fontWeight: 510, fontSize: 13 }}>퀴즈 평균</th>
                 <th className="px-5 py-3 cursor-pointer select-none" style={{ fontWeight: 510, fontSize: 13 }} onClick={() => toggleSort('last_active_days_ago')}>
-                  최근 활동<SortIcon column="last_active_days_ago" />
+                  최근 활동{renderSortIcon('last_active_days_ago')}
                 </th>
                 <th className="px-5 py-3 text-right" style={{ fontWeight: 510, fontSize: 13 }}></th>
               </tr>

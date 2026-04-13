@@ -2,8 +2,7 @@
 
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
-export const alt = 'CatchUp AI — 학습 이탈 방지 AI 코파일럿';
+export const alt = 'CatchUp AI - Learning risk prevention AI copilot';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -67,7 +66,7 @@ export default async function Image() {
             lineHeight: 1.5,
           }}
         >
-          학습 이탈 방지 AI 코파���럿
+          Learning risk prevention AI copilot
         </div>
 
         {/* Stats */}

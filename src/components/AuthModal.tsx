@@ -5,7 +5,7 @@
 
 import { useState, useMemo } from 'react';
 import { createClient } from '@/lib/supabase-browser';
-import { X, Mail, AlertCircle } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 
 type Tab = 'login' | 'signup';
 
@@ -25,10 +25,9 @@ export function AuthModal({
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const supabase = useMemo(() => createClient(), []);
 
   if (!isOpen) return null;
-
-  const supabase = useMemo(() => createClient(), []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

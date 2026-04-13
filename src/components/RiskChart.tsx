@@ -23,16 +23,21 @@ export function RiskChart({ data, total }: { data: ChartData; total: number }) {
 
   const cx = 80, cy = 80, r = 60;
   const circumference = 2 * Math.PI * r;
-  let offset = 0;
-
-  const arcs = SEGMENTS.map(seg => {
+  const arcs = SEGMENTS.reduce<Array<(typeof SEGMENTS)[number] & {
+    value: number;
+    ratio: number;
+    length: number;
+    offset: number;
+  }>>((acc, seg) => {
+    const offset = acc.reduce((sum, arc) => sum + arc.length, 0);
     const value = data[seg.key];
     const ratio = value / total;
     const length = ratio * circumference;
-    const arc = { ...seg, value, ratio, length, offset };
-    offset += length;
-    return arc;
-  }).filter(a => a.value > 0);
+    if (value > 0) {
+      acc.push({ ...seg, value, ratio, length, offset });
+    }
+    return acc;
+  }, []);
 
   return (
     <div className="card p-8">

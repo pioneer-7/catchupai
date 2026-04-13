@@ -5,7 +5,7 @@ import { type NextRequest } from 'next/server';
 import { db } from '@/lib/supabase';
 import { validateApiKey } from '@/lib/api-auth';
 import { WebhookRegisterSchema } from '@/lib/validation';
-import { successResponse, errorResponse } from '@/lib/api-helpers';
+import { errorResponse } from '@/lib/api-helpers';
 
 // POST /api/v1/webhooks — 등록
 export async function POST(request: NextRequest) {
