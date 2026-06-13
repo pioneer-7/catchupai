@@ -8,6 +8,11 @@ import { assessmentRepository } from '@/repositories/assessment.repository';
 import { calculateRisk } from '@/lib/risk-scoring';
 import { StudentUploadRowSchema } from '@/lib/validation';
 import { SAMPLE_COURSE, SAMPLE_STUDENTS, SAMPLE_MATERIAL_TEXT } from '@/lib/sample-data';
+import {
+  getDemoSampleLoadResult,
+  logDemoSampleFallback,
+  shouldUseDemoSampleFallback,
+} from '@/lib/demo-sample';
 
 const SAMPLE_VISIBILITY_RETRIES = 5;
 const SAMPLE_VISIBILITY_DELAY_MS = 150;
@@ -18,33 +23,40 @@ function delay(ms: number): Promise<void> {
 
 export const uploadService = {
   async loadSampleData(): Promise<{ course_id: string; total_rows: number }> {
-    await assessmentRepository.deleteAll();
-    await interventionMessageRepository.deleteAll();
-    await recoveryPlanRepository.deleteAll();
-    await progressRepository.deleteAll();
-    await studentRepository.deleteAll();
-    await courseRepository.deleteAll();
+    try {
+      await assessmentRepository.deleteAll();
+      await interventionMessageRepository.deleteAll();
+      await recoveryPlanRepository.deleteAll();
+      await progressRepository.deleteAll();
+      await studentRepository.deleteAll();
+      await courseRepository.deleteAll();
 
-    const course = await courseRepository.save({
-      title: SAMPLE_COURSE.title,
-      description: SAMPLE_COURSE.description,
-      uploaded_material_text: SAMPLE_MATERIAL_TEXT,
-    });
+      const course = await courseRepository.save({
+        title: SAMPLE_COURSE.title,
+        description: SAMPLE_COURSE.description,
+        uploaded_material_text: SAMPLE_MATERIAL_TEXT,
+      });
 
-    for (const s of SAMPLE_STUDENTS) {
-      await this.upsertStudentWithProgress(s, course.id);
-    }
-
-    // Avoid navigating from the landing CTA before the list query can see the seeded rows.
-    for (let attempt = 0; attempt < SAMPLE_VISIBILITY_RETRIES; attempt++) {
-      const rows = await progressRepository.findAllWithStudents();
-      if (rows.length >= SAMPLE_STUDENTS.length) {
-        return { course_id: course.id, total_rows: SAMPLE_STUDENTS.length };
+      for (const s of SAMPLE_STUDENTS) {
+        await this.upsertStudentWithProgress(s, course.id);
       }
-      await delay(SAMPLE_VISIBILITY_DELAY_MS);
-    }
 
-    throw new Error('SAMPLE_DATA_NOT_VISIBLE');
+      // Avoid navigating from the landing CTA before the list query can see the seeded rows.
+      for (let attempt = 0; attempt < SAMPLE_VISIBILITY_RETRIES; attempt++) {
+        const rows = await progressRepository.findAllWithStudents();
+        if (rows.length >= SAMPLE_STUDENTS.length) {
+          return { course_id: course.id, total_rows: SAMPLE_STUDENTS.length };
+        }
+        await delay(SAMPLE_VISIBILITY_DELAY_MS);
+      }
+
+      throw new Error('SAMPLE_DATA_NOT_VISIBLE');
+    } catch (error) {
+      if (!shouldUseDemoSampleFallback(error)) throw error;
+
+      logDemoSampleFallback('uploadService.loadSampleData', error);
+      return getDemoSampleLoadResult();
+    }
   },
 
   async importFromCSV(text: string): Promise<{ total_rows: number; processed: number; skipped: number; course_id: string }> {
