@@ -5,10 +5,17 @@ import { studentService } from '@/services/student.service';
 import { courseRepository } from '@/repositories/course.repository';
 import { predictionRepository } from '@/repositories/prediction.repository';
 import { buildAiContext, generateRiskPrediction } from '@/lib/ai';
+import { getDemoRiskPrediction, isDemoStudentId } from '@/lib/demo-sample';
 import type { RiskPrediction } from '@/types';
 
 export const predictionService = {
   async generate(studentId: string): Promise<RiskPrediction> {
+    if (isDemoStudentId(studentId)) {
+      const prediction = getDemoRiskPrediction(studentId);
+      if (!prediction) throw new Error('STUDENT_NOT_FOUND');
+      return prediction;
+    }
+
     const data = await studentService.getStudentDetail(studentId);
     if (!data) throw new Error('STUDENT_NOT_FOUND');
 

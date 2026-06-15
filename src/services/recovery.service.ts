@@ -6,10 +6,17 @@ import { recoveryPlanRepository } from '@/repositories/recovery-plan.repository'
 import { buildAiContext, generateRecoveryPlan } from '@/lib/ai';
 import { createEvent } from '@/lib/events';
 import { dispatchEvent } from '@/lib/webhook-dispatcher';
+import { getDemoRecoveryPlan, isDemoStudentId } from '@/lib/demo-sample';
 import type { RecoveryPlan } from '@/types';
 
 export const recoveryService = {
   async generate(studentId: string): Promise<RecoveryPlan> {
+    if (isDemoStudentId(studentId)) {
+      const plan = getDemoRecoveryPlan(studentId);
+      if (!plan) throw new Error('STUDENT_NOT_FOUND');
+      return plan;
+    }
+
     const data = await studentService.getStudentDetail(studentId);
     if (!data) throw new Error('STUDENT_NOT_FOUND');
 

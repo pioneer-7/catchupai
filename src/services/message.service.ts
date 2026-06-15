@@ -3,6 +3,7 @@ import { studentService } from '@/services/student.service';
 import { courseRepository } from '@/repositories/course.repository';
 import { interventionMessageRepository } from '@/repositories/intervention-message.repository';
 import { buildAiContext, generateInterventionMessage } from '@/lib/ai';
+import { getDemoInterventionMessage, isDemoStudentId } from '@/lib/demo-sample';
 import type { InterventionMessage } from '@/types';
 
 export const messageService = {
@@ -10,6 +11,12 @@ export const messageService = {
     studentId: string,
     messageType: 'teacher' | 'operator' | 'student_support' = 'teacher'
   ): Promise<InterventionMessage> {
+    if (isDemoStudentId(studentId)) {
+      const msg = getDemoInterventionMessage(studentId, messageType);
+      if (!msg) throw new Error('STUDENT_NOT_FOUND');
+      return msg;
+    }
+
     const data = await studentService.getStudentDetail(studentId);
     if (!data) throw new Error('STUDENT_NOT_FOUND');
 

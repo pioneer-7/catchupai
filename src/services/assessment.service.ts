@@ -8,10 +8,21 @@ import { buildAiContext, generateMiniAssessment } from '@/lib/ai';
 import { calculateScoreDelta, recalculateLevel } from '@/lib/risk-scoring';
 import { createEvent } from '@/lib/events';
 import { dispatchEvent } from '@/lib/webhook-dispatcher';
+import {
+  getDemoAssessmentSubmitResult,
+  getDemoMiniAssessment,
+  isDemoStudentId,
+} from '@/lib/demo-sample';
 import type { MiniAssessment, AssessmentSubmitData, SubmittedAnswer } from '@/types';
 
 export const assessmentService = {
   async generate(studentId: string): Promise<MiniAssessment> {
+    if (isDemoStudentId(studentId)) {
+      const assessment = getDemoMiniAssessment(studentId);
+      if (!assessment) throw new Error('STUDENT_NOT_FOUND');
+      return assessment;
+    }
+
     const data = await studentService.getStudentDetail(studentId);
     if (!data) throw new Error('STUDENT_NOT_FOUND');
 
@@ -42,6 +53,12 @@ export const assessmentService = {
     assessmentId: string,
     answers: SubmittedAnswer[]
   ): Promise<AssessmentSubmitData> {
+    if (isDemoStudentId(studentId)) {
+      const result = getDemoAssessmentSubmitResult(studentId, answers);
+      if (!result) throw new Error('ASSESSMENT_NOT_FOUND');
+      return result;
+    }
+
     const data = await studentService.getStudentDetail(studentId);
     if (!data) throw new Error('STUDENT_NOT_FOUND');
 
